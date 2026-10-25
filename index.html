@@ -777,6 +777,16 @@ button.cal-du.late{cursor:pointer}
 .iv-row.done{color:var(--muted)}.iv-row.done .iv-who{font-weight:500}
 .iv-join{font-size:12.5px;font-weight:600;color:#fff;background:var(--accent);border-radius:7px;padding:3px 10px;text-decoration:none}
 .iv-done{font-size:12px;color:var(--muted)}
+.src-row{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:start;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.src-row:first-child{border-top:0}
+.src-tier{font-weight:700;font-size:12px;text-align:center;border-radius:6px;padding:2px 0;background:var(--line)}
+.src-tier.A{background:var(--accent);color:#fff}
+.src-who{min-width:0;overflow-wrap:anywhere}.src-who b{font-weight:600}
+.src-sub{display:block;font-size:12.5px;color:var(--muted)}
+.src-why{display:block;font-size:12.5px;margin-top:2px}
+.src-watch{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.src-st{font-size:12px;color:var(--muted);white-space:nowrap}
+.src-legend{font-size:12px;color:var(--muted);margin-top:6px}
 @media (max-width:560px){.iv-row{grid-template-columns:1fr auto}.iv-when{grid-column:1 / -1;font-size:12.5px;color:var(--muted)}.iv-row.today .iv-when{color:var(--accent)}}
 
 .tnote{font-size:13px;color:var(--muted);padding:12px 18px;border-top:1px solid var(--line)}
@@ -1360,6 +1370,19 @@ button.cal-du.late{cursor:pointer}
     return `<div class="iv"><div class="iv-h"><b>Interviews</b><span>${up.length ? `${up.length} upcoming` : "None booked ahead"}${past.length ? ` · ${past.length} in the last 14 days` : ""}</span></div>
       <ul class="iv-list">${up.map(v => row(v, false)).join("")}${past.slice(0, 4).map(v => row(v, true)).join("")}</ul></div>`;
   }
+  function tvSourcing(s) {
+    if (state.clientView) return "";
+    const all = Array.isArray(s.sourcing) ? s.sourcing : []; if (!all.length) return "";
+    const ord = { A: 0, B: 1, C: 2 };
+    const rows = all.slice().sort((a, b) => (ord[a.tier] ?? 9) - (ord[b.tier] ?? 9));
+    const nA = rows.filter(r => r.tier === "A").length;
+    const nOpen = rows.filter(r => !r.status || /not contacted/i.test(r.status)).length;
+    return `<div class="iv"><div class="iv-h"><b>Sourcing</b><span>${rows.length} outreach target${rows.length === 1 ? "" : "s"} · ${nA} Tier A · ${nOpen} not contacted yet</span></div>
+      <ul class="iv-list">${rows.map(r => `<li class="src-row"><span class="src-tier ${esc(r.tier || "")}">${esc(r.tier || "–")}</span>
+        <span class="src-who"><b>${esc(r.name || "")}</b><span class="src-sub">${esc([r.role, r.org, r.location].filter(Boolean).join(" · "))}</span>${r.why ? `<span class="src-why">${esc(r.why)}</span>` : ""}${r.watch ? `<span class="src-watch">Watch: ${esc(r.watch)}</span>` : ""}</span>
+        <span class="src-st">${esc(r.status || "Not contacted")}</span></li>`).join("")}</ul>
+      <div class="src-legend">Tier A could be the hire · Tier B runs professional standards, approach for referrals first · Tier C is a referral or network source</div></div>`;
+  }
   function renderTalent() {
     const main = $("#main");
     const cName = id => { const c = state.clients.find(x => x.id === id); return c ? (c.short||c.name) : id; };
@@ -1388,6 +1411,7 @@ button.cal-du.late{cursor:pointer}
           <div class="sc">${t.score !== "" && t.score != null ? `${showSc ? `<div class="n">${esc(t.score)}<span> / ${mx}</span></div>` : ""}<span class="share" title="Rubric rating"><i style="width:${Math.max(0, Math.min(100, (+t.score||0) / mx * 100))}%"></i></span>` : ""}${t.band ? `<span class="pill ${bandCls(t.band)}">${esc(t.band)}</span>` : ""}</div></li>`).join("")}</ol>`
           : `<div class="tnote">${esc(s.note || "No applicant tracker on file yet.")}</div>`}
         ${s.note && top.length ? `<div class="tnote">${esc(s.note)}</div>` : ""}
+        ${tvSourcing(s)}
       </details>`;
     };
     main.innerHTML = `<div class="top"><header class="head"><div style="min-width:0">
@@ -3453,7 +3477,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "bfd04cb794";
+  var BUILD = "1c95ba6f93";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
