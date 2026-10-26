@@ -1372,7 +1372,7 @@ button.cal-du.late{cursor:pointer}
   }
   function tvSourcing(s) {
     if (state.clientView) return "";
-    const all = Array.isArray(s.sourcing) ? s.sourcing : []; if (!all.length) return "";
+    const all = Array.isArray(s.sourcing) ? s.sourcing : ((state.srcBy || {})[s.id] || []); if (!all.length) return "";
     const ord = { A: 0, B: 1, C: 2 };
     const rows = all.slice().sort((a, b) => (ord[a.tier] ?? 9) - (ord[b.tier] ?? 9));
     const nA = rows.filter(r => r.tier === "A").length;
@@ -2605,6 +2605,71 @@ button.cal-du.late{cursor:pointer}
       calNewEvent(col.dataset.day, pad2(Math.min(23, hh)) + ":" + pad2(mm));
     }
   });
+
+  /* ---------- Client intelligence (written by the client intelligence analyst) ---------- */
+  const INTEL = { signal: "", client: "", status: "open", show: 40, cshow: {} };
+  const SIG = { opportunity: ["active", "Opportunity"], risk: ["late", "Risk"], watch: ["planned", "Watch"], info: ["done", "Info"] };
+  const ITYPE = { news: "News", leadership: "Leadership", market: "Market", legislation: "Policy", event: "Event", org: "Organization", opening: "Opening", other: "Other" };
+  const intelOpen = i => !i.status || i.status === "new";
+  const intelSort = (a, b) => String(b.date || "").localeCompare(String(a.date || "")) || String(b.found || "").localeCompare(String(a.found || ""));
+  const safeUrl = u => /^https?:\/\//i.test(String(u || "")) ? u : "";
+  async function intelLoad() {
+    try { const r = await gs("getIntel"); const list = Array.isArray(r) ? r : (r && (r.intel || r.items)) || []; state.intel = list.filter(i => i && i.client && i.title).map(i => Object.assign({ _id: i._id || i.id, status: i.status || "new" }, i)); if (!state.intelMeta || (r && r.meta)) state.intelMeta = (r && r.meta) || (() => { const f = state.intel.map(i => String(i.found || "")).sort().pop(); return f ? { lastRun: f } : null; })(); if (r && r.sourcing) state.srcBy = r.sourcing; render(); } catch (e) {}
+  }
+  function intelCard(i, showClient) {
+    const c = state.clients.find(x => x.id === i.client);
+    const s = SIG[i.signal] || SIG.info, done = !intelOpen(i), can = state.canEdit && !state.clientView, url = safeUrl(i.url);
+    const stLab = i.status === "actioned" ? "Acted on" : i.status === "dismissed" ? "Dismissed" : "Reviewed";
+    return `<li class="in-row${done ? " in-done" : ""}">
+      <div class="in-top"><span class="pill ${s[0]}">${s[1]}</span><span class="in-meta">${i.date ? esc(fmtDay(i.date) + " " + String(i.date).slice(0, 4)) : ""}${i.type ? " · " + esc(ITYPE[i.type] || i.type) : ""}${showClient && c ? ` · <button type="button" class="linkbtn" data-go="${esc(c.id)}">${esc(c.short || c.name)}</button>` : ""}</span></div>
+      <div class="in-t">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(i.title)} ↗</a>` : esc(i.title)}</div>
+      ${i.summary ? `<div class="in-s">${esc(i.summary)}</div>` : ""}
+      ${i.action ? `<div class="in-a"><small>Suggested move</small><span>${esc(i.action)}</span></div>` : ""}
+      <div class="in-f"><span class="in-src">${esc(i.source || "")}</span>${can ? (done ? `<span class="in-st">${esc(stLab)}</span><button type="button" class="linkbtn" data-intel-st="new" data-intel-id="${esc(i._id)}">Reopen</button>` : `<button type="button" class="btn" data-intel-st="actioned" data-intel-id="${esc(i._id)}">Acted on</button><button type="button" class="btn" data-intel-st="reviewed" data-intel-id="${esc(i._id)}">Reviewed</button><button type="button" class="linkbtn" data-intel-st="dismissed" data-intel-id="${esc(i._id)}">Dismiss</button>`) : ""}</div>
+    </li>`;
+  }
+  function renderIntel() {
+    const main = $("#main"), all = [...state.intel].sort(intelSort);
+    const wk = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+    const open = all.filter(intelOpen);
+    const nOpp = open.filter(i => i.signal === "opportunity").length, nRisk = open.filter(i => i.signal === "risk").length;
+    const nWeek = all.filter(i => String(i.found || i.date || "").slice(0, 10) >= wk).length;
+    const list = all.filter(i => (INTEL.status === "all" || (INTEL.status === "open" ? intelOpen(i) : !intelOpen(i))) && (!INTEL.signal || i.signal === INTEL.signal) && (!INTEL.client || i.client === INTEL.client));
+    const meta = state.intelMeta || {};
+    const cw = [...new Set(all.map(i => i.client))].map(id => state.clients.find(c => c.id === id)).filter(Boolean).sort((a, b) => (a.short || a.name).localeCompare(b.short || b.name));
+    const chip = (attr, val, label, on) => `<button type="button" ${attr}="${esc(val)}" aria-pressed="${on}">${esc(label)}</button>`;
+    const last = meta.lastRun ? new Date(meta.lastRun) : null;
+    main.innerHTML = `<div class="top"><header class="head"><div style="min-width:0">
+        <h1>Intelligence</h1>
+        <p class="lede">News, leadership changes, market data and policy moves for every client, gathered by the client intelligence analyst. Opportunities are openings for new work; risks are things to get ahead of.</p>
+        <div class="in-run">${last && !isNaN(last) ? `Last scan ${esc(last.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}${meta.scanned ? ` · ${esc(String(meta.scanned))} client${meta.scanned == 1 ? "" : "s"} checked` : ""}${meta.found != null ? ` · ${esc(String(meta.found))} new item${meta.found == 1 ? "" : "s"}` : ""}` : "The first scan runs on the next weekday morning."}</div>
+      </div></header>
+      <div class="stats"><div class="stat"><div class="n">${nOpp}</div><div class="l">open opportunities</div></div><div class="stat"><div class="n ${nRisk ? "warn" : ""}">${nRisk}</div><div class="l">open risks</div></div><div class="stat"><div class="n">${open.length}</div><div class="l">waiting for review</div></div><div class="stat"><div class="n">${nWeek}</div><div class="l">found in the last 7 days</div></div></div></div>
+      <section class="section"><div class="filters">${chip("data-in-status", "open", "To review", INTEL.status === "open")}${chip("data-in-status", "done", "Handled", INTEL.status === "done")}${chip("data-in-status", "all", "All", INTEL.status === "all")}<span class="cm-sep"></span>${chip("data-in-sig", "", "Every signal", !INTEL.signal)}${Object.entries(SIG).map(([k, v]) => chip("data-in-sig", k, v[1], INTEL.signal === k)).join("")}${cw.length ? `<select class="cm-pick" data-in-client aria-label="Client"><option value="">All clients</option>${cw.map(c => `<option value="${esc(c.id)}"${INTEL.client === c.id ? " selected" : ""}>${esc(c.short || c.name)}</option>`).join("")}</select>` : ""}</div>
+      ${list.length ? `<ul class="in-list">${list.slice(0, INTEL.show).map(i => intelCard(i, true)).join("")}</ul>${list.length > INTEL.show ? `<button type="button" class="linkbtn" data-in-more>Show ${Math.min(40, list.length - INTEL.show)} more</button>` : ""}` : `<div class="empty">${all.length ? "Nothing matches this filter." : "No intelligence yet. The analyst's first scan will fill this in."}</div>`}</section>`;
+  }
+  function intelSection(c) {
+    if (state.clientView || !c) return "";
+    const L = state.intel.filter(i => i.client === c.id).sort(intelSort), open = L.filter(intelOpen);
+    const show = INTEL.cshow[c.id] ? L : (open.length ? open : L).slice(0, 5);
+    return `<section class="section in-sec"><div class="section-head"><h2>Intelligence</h2><span class="note">${L.length ? `${open.length} to review of ${L.length} · from the client intelligence analyst · internal only` : "Nothing found yet · internal only"}</span></div>
+      ${L.length ? `<ul class="in-list">${show.map(i => intelCard(i, false)).join("")}</ul>${show.length < L.length ? `<button type="button" class="linkbtn" data-in-all="${esc(c.id)}">Show all ${L.length}</button>` : ""}` : `<div class="cal-m">The analyst checks this client every week and posts anything worth knowing here.</div>`}</section>`;
+  }
+  function intelStripLine() {
+    if (state.clientView) return "";
+    const open = state.intel.filter(intelOpen); if (!open.length) return "";
+    const o = open.filter(i => i.signal === "opportunity").length, r = open.filter(i => i.signal === "risk").length;
+    return `<div class="due-strip"><span>Intelligence: <b>${open.length} to review</b>${o ? ` · ${o} opportunit${o === 1 ? "y" : "ies"}` : ""}${r ? ` · <b class="late">${r} risk${r === 1 ? "" : "s"}</b>` : ""}</span><button type="button" class="linkbtn" data-id-go="__intel">Open intelligence</button></div>`;
+  }
+  document.addEventListener("click", async e => {
+    const st = e.target.closest("[data-intel-st]");
+    if (st) { if (!state.canEdit) return; st.disabled = true; try { await gs("setIntelStatus", st.dataset.intelId, st.dataset.intelSt); const it = state.intel.find(x => x._id === st.dataset.intelId); if (it) it.status = st.dataset.intelSt; renderMain(); } catch (err) { st.disabled = false; } return; }
+    const s1 = e.target.closest("[data-in-status]"); if (s1) { INTEL.status = s1.dataset.inStatus; INTEL.show = 40; renderMain(); return; }
+    const s2 = e.target.closest("[data-in-sig]"); if (s2) { INTEL.signal = s2.dataset.inSig; INTEL.show = 40; renderMain(); return; }
+    if (e.target.closest("[data-in-more]")) { INTEL.show += 40; renderMain(); return; }
+    const a = e.target.closest("[data-in-all]"); if (a) { INTEL.cshow[a.dataset.inAll] = true; renderMain(); }
+  });
+  document.addEventListener("change", e => { const s = e.target.closest && e.target.closest("[data-in-client]"); if (s) { INTEL.client = s.value; INTEL.show = 40; renderMain(); } });
   /* ---------- Update with Claude: a chat that proposes changes, you approve, then it writes Pulse + the Sheet ---------- */
   const HUB_SHEET = "1BqKPiq-SBVObDvnQ_8tbtKc_QCN8MuIySgs9kaZjxl8";
   const GSHEETS = "Google Sheets";
@@ -3155,75 +3220,6 @@ Rules:
     const t = setInterval(() => { const el = document.querySelector(`.rail [data-id="${CSS.escape(c)}"]`); if (el) { clearInterval(t); el.click(); } else if (++n > 40) clearInterval(t); }, 500);
   })();
 
-
-  /* ---------- Client intelligence (written by the client intelligence analyst) ---------- */
-  const INTEL = { signal: "", client: "", status: "open", show: 40, cshow: {} };
-  const SIG = { opportunity: ["active", "Opportunity"], risk: ["late", "Risk"], watch: ["planned", "Watch"], info: ["done", "Info"] };
-  const ITYPE = { news: "News", leadership: "Leadership", market: "Market", legislation: "Policy", event: "Event", org: "Organization", opening: "Opening", other: "Other" };
-  const intelOpen = i => !i.status || i.status === "new";
-  const intelSort = (a, b) => String(b.date || "").localeCompare(String(a.date || "")) || String(b.found || "").localeCompare(String(a.found || ""));
-  async function intelLoad() {
-    if (INTEL.loading || INTEL.server === false) return; INTEL.loading = true;
-    try { const r = await gs("getIntel"); const list = Array.isArray(r) ? r : (r && r.items) || []; state.intel = list.filter(i => i && i.client && i.title).map(i => Object.assign({ _id: i.id }, i)); if (r && r.meta) state.intelMeta = r.meta; INTEL.server = true; render(); }
-    catch (e) { INTEL.server = false; if (state.current === "__intel") renderMain(); }
-    finally { INTEL.loading = false; }
-  }
-  const safeUrl = u => /^https?:\/\//i.test(String(u || "")) ? u : "";
-  function intelCard(i, showClient) {
-    const c = state.clients.find(x => x.id === i.client);
-    const s = SIG[i.signal] || SIG.info, done = !intelOpen(i), can = state.canEdit && !state.clientView, url = safeUrl(i.url);
-    const stLab = i.status === "actioned" ? "Acted on" : i.status === "dismissed" ? "Dismissed" : "Reviewed";
-    return `<li class="in-row${done ? " in-done" : ""}">
-      <div class="in-top"><span class="pill ${s[0]}">${s[1]}</span><span class="in-meta">${i.date ? esc(fmtDay(i.date) + " " + String(i.date).slice(0, 4)) : ""}${i.type ? " · " + esc(ITYPE[i.type] || i.type) : ""}${showClient && c ? ` · <button type="button" class="linkbtn" data-go="${esc(c.id)}">${esc(c.short || c.name)}</button>` : ""}</span></div>
-      <div class="in-t">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(i.title)} ↗</a>` : esc(i.title)}</div>
-      ${i.summary ? `<div class="in-s">${esc(i.summary)}</div>` : ""}
-      ${i.action ? `<div class="in-a"><small>Suggested move</small><span>${esc(i.action)}</span></div>` : ""}
-      <div class="in-f"><span class="in-src">${esc(i.source || "")}</span>${can ? (done ? `<span class="in-st">${esc(stLab)}</span><button type="button" class="linkbtn" data-intel-st="new" data-intel-id="${esc(i._id)}">Reopen</button>` : `<button type="button" class="btn" data-intel-st="actioned" data-intel-id="${esc(i._id)}">Acted on</button><button type="button" class="btn" data-intel-st="reviewed" data-intel-id="${esc(i._id)}">Reviewed</button><button type="button" class="linkbtn" data-intel-st="dismissed" data-intel-id="${esc(i._id)}">Dismiss</button>`) : ""}</div>
-    </li>`;
-  }
-  function renderIntel() {
-    const main = $("#main"), all = [...state.intel].sort(intelSort);
-    const wk = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
-    const open = all.filter(intelOpen);
-    const nOpp = open.filter(i => i.signal === "opportunity").length, nRisk = open.filter(i => i.signal === "risk").length;
-    const nWeek = all.filter(i => String(i.found || i.date || "").slice(0, 10) >= wk).length;
-    const list = all.filter(i => (INTEL.status === "all" || (INTEL.status === "open" ? intelOpen(i) : !intelOpen(i))) && (!INTEL.signal || i.signal === INTEL.signal) && (!INTEL.client || i.client === INTEL.client));
-    const meta = state.intelMeta || {};
-    const cw = [...new Set(all.map(i => i.client))].map(id => state.clients.find(c => c.id === id)).filter(Boolean).sort((a, b) => (a.short || a.name).localeCompare(b.short || b.name));
-    const chip = (attr, val, label, on) => `<button type="button" ${attr}="${esc(val)}" aria-pressed="${on}">${esc(label)}</button>`;
-    const last = meta.lastRun ? new Date(meta.lastRun) : null;
-    main.innerHTML = `<div class="top"><header class="head"><div style="min-width:0">
-        <h1>Intelligence</h1>
-        <p class="lede">News, leadership changes, market data and policy moves for every client, gathered by the client intelligence analyst. Opportunities are openings for new work; risks are things to get ahead of.</p>
-        <div class="in-run">${last && !isNaN(last) ? `Last scan ${esc(last.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}${meta.scanned ? ` · ${esc(String(meta.scanned))} client${meta.scanned == 1 ? "" : "s"} checked` : ""}${meta.found != null ? ` · ${esc(String(meta.found))} new item${meta.found == 1 ? "" : "s"}` : ""}` : "The first scan runs on the next weekday morning."}</div>
-      </div></header>
-      ${INTEL.server === false ? `<div class="banner">This version of Pulse needs a one-time server update before it can show intelligence. Until then, use the Claude version of Pulse.</div>` : ""}${INTEL.err ? `<div class="banner">${esc(INTEL.err)}</div>` : ""}
-      <div class="stats"><div class="stat"><div class="n">${nOpp}</div><div class="l">open opportunities</div></div><div class="stat"><div class="n ${nRisk ? "warn" : ""}">${nRisk}</div><div class="l">open risks</div></div><div class="stat"><div class="n">${open.length}</div><div class="l">waiting for review</div></div><div class="stat"><div class="n">${nWeek}</div><div class="l">found in the last 7 days</div></div></div></div>
-      <section class="section"><div class="filters">${chip("data-in-status", "open", "To review", INTEL.status === "open")}${chip("data-in-status", "done", "Handled", INTEL.status === "done")}${chip("data-in-status", "all", "All", INTEL.status === "all")}<span class="cm-sep"></span>${chip("data-in-sig", "", "Every signal", !INTEL.signal)}${Object.entries(SIG).map(([k, v]) => chip("data-in-sig", k, v[1], INTEL.signal === k)).join("")}${cw.length ? `<select class="cm-pick" data-in-client aria-label="Client"><option value="">All clients</option>${cw.map(c => `<option value="${esc(c.id)}"${INTEL.client === c.id ? " selected" : ""}>${esc(c.short || c.name)}</option>`).join("")}</select>` : ""}</div>
-      ${list.length ? `<ul class="in-list">${list.slice(0, INTEL.show).map(i => intelCard(i, true)).join("")}</ul>${list.length > INTEL.show ? `<button type="button" class="linkbtn" data-in-more>Show ${Math.min(40, list.length - INTEL.show)} more</button>` : ""}` : `<div class="empty">${all.length ? "Nothing matches this filter." : "No intelligence yet. The analyst's first scan will fill this in."}</div>`}</section>`;
-  }
-  function intelSection(c) {
-    if (state.clientView || !c) return "";
-    const L = state.intel.filter(i => i.client === c.id).sort(intelSort), open = L.filter(intelOpen);
-    const show = INTEL.cshow[c.id] ? L : (open.length ? open : L).slice(0, 5);
-    return `<section class="section in-sec"><div class="section-head"><h2>Intelligence</h2><span class="note">${L.length ? `${open.length} to review of ${L.length} · from the client intelligence analyst · internal only` : "Nothing found yet · internal only"}</span></div>
-      ${L.length ? `<ul class="in-list">${show.map(i => intelCard(i, false)).join("")}</ul>${show.length < L.length ? `<button type="button" class="linkbtn" data-in-all="${esc(c.id)}">Show all ${L.length}</button>` : ""}` : `<div class="cal-m">The analyst checks this client every week and posts anything worth knowing here.</div>`}</section>`;
-  }
-  function intelStripLine() {
-    if (state.clientView) return "";
-    const open = state.intel.filter(intelOpen); if (!open.length) return "";
-    const o = open.filter(i => i.signal === "opportunity").length, r = open.filter(i => i.signal === "risk").length;
-    return `<div class="due-strip"><span>Intelligence: <b>${open.length} to review</b>${o ? ` · ${o} opportunit${o === 1 ? "y" : "ies"}` : ""}${r ? ` · <b class="late">${r} risk${r === 1 ? "" : "s"}</b>` : ""}</span><button type="button" class="linkbtn" data-id-go="__intel">Open intelligence</button></div>`;
-  }
-  document.addEventListener("click", async e => {
-    const st = e.target.closest("[data-intel-st]");
-    if (st) { if (!state.canEdit) return; st.disabled = true; const id = st.dataset.intelId, val = st.dataset.intelSt; try { await gs("setIntelStatus", id, val); const it = state.intel.find(x => x._id === id); if (it) it.status = val; render(); } catch (err) { st.disabled = false; INTEL.err = /unknown|not.*function|no such/i.test(err.message) ? "Marking items needs the one-time server update." : err.message; renderMain(); } return; }
-    const s1 = e.target.closest("[data-in-status]"); if (s1) { INTEL.status = s1.dataset.inStatus; INTEL.show = 40; renderMain(); return; }
-    const s2 = e.target.closest("[data-in-sig]"); if (s2) { INTEL.signal = s2.dataset.inSig; INTEL.show = 40; renderMain(); return; }
-    if (e.target.closest("[data-in-more]")) { INTEL.show += 40; renderMain(); return; }
-    const a = e.target.closest("[data-in-all]"); if (a) { INTEL.cshow[a.dataset.inAll] = true; renderMain(); }
-  });
-  document.addEventListener("change", e => { const s = e.target.closest && e.target.closest("[data-in-client]"); if (s) { INTEL.client = s.value; INTEL.show = 40; renderMain(); } });
   function render(){ renderRail(); renderMain(); chatSync(); }
 
   function openItem(item) {
@@ -3362,8 +3358,6 @@ Rules:
     d = Object.assign({}, d, { clients: (d.clients || []).map(c => { const x = Object.assign({}, c); if (x.logoId && logoCache[x.logoId]) x.logo = logoCache[x.logoId]; return x; }) });
     setTimeout(fetchLogos_, 0);
     state.clients = d.clients; state.items = d.items; state.invoices = d.invoices || []; state.overrides = d.overrides || []; state.searches = d.searches || []; state.canEdit = d.canEdit;
-    if (Array.isArray(d.intel)) { state.intel = d.intel.filter(i => i && i.client && i.title).map(i => Object.assign({ _id: i.id }, i)); INTEL.server = true; } else setTimeout(intelLoad, 0);
-    if (state.intelMeta == null && d.intelMeta) state.intelMeta = d.intelMeta;
     if (state.current !== "__billing" && state.current !== "__home" && state.current !== "__talent" && state.current !== "__reports" && state.current !== "__calendar" && state.current !== "__pipeline" && state.current !== "__intel" && !state.clients.find(c => c.id === state.current)) state.current = state.clients[0]?.id || null;
     render();
   }
@@ -3377,6 +3371,7 @@ Rules:
       const d = await gs("getHubData", force === true);
       applyData_(d);
       store.set("pulse.hub", JSON.stringify(d));
+      intelLoad();
     } catch (err) {
       if (err && err.auth) return;
       if (!shown) $("#main").innerHTML = `<div class="empty">Couldn't load the hub from the Sheet. Reload the page; if it keeps failing, check that the tabs Clients, Contacts, Engagements, Initial Scope and Work Log still exist.</div>`;
@@ -3477,7 +3472,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "1c95ba6f93";
+  var BUILD = "e11dadf09f";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
