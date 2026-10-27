@@ -675,6 +675,25 @@ button.cal-du.late{cursor:pointer}
 /* ---------- communications log ---------- */
 .cm-f{flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .cm-f button span{color:var(--muted);font-weight:500;margin-left:2px}
+.mk-theme{font-size:14.5px;font-weight:600;line-height:1.35}
+.mk-line{display:flex;flex-direction:column;gap:1px}
+.mk-line small,.mk-chk small{font-size:11.5px;color:var(--muted);font-weight:600}
+.mk-line span{font-size:13.5px}
+.mk-sl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.mk-sl li{padding-left:12px;position:relative}
+.mk-sl li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--line)}
+.mk-sl li.lead::before{background:var(--accent)}
+.mk-sl b{font-size:11.5px;color:var(--accent);font-weight:600;margin-right:2px}
+.mk-warn{font-size:11px;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:0 5px}
+.mk-chk{background:var(--warn-soft);border-radius:8px;padding:7px 10px;display:flex;flex-direction:column;gap:1px}
+.mk-chk small{color:var(--warn)}.mk-chk span{font-size:13.5px}
+.mk-in{margin-left:auto}
+.mk-acts{display:flex;justify-content:flex-end;margin:8px 0 6px}
+.mk-body{white-space:pre-wrap;font-size:14px;line-height:1.55;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;max-height:520px;overflow:auto}
+.mk-issue .pj-items>summary{font-size:13.5px}
+.stat .n .of{font-size:15px;color:var(--muted);font-weight:400}
+@media (max-width:640px){.mk-in{margin-left:0}}
+@media (max-width:760px){.rail .rail-foot{flex-wrap:wrap}.rail .rail-foot .btn{flex:1 1 30%}}
 .in-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
 .in-row{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .in-row.in-done{opacity:.72}
@@ -1006,13 +1025,13 @@ button.cal-du.late{cursor:pointer}
     const otherC = state.clients.filter(c => !isActive(c) && !isProsp(c)).sort((a,b) => billedTot(b.id) - billedTot(a.id) || nm(a).localeCompare(nm(b)));
     const sorted = [...prospC, ...activeC, ...otherC];
     const grpLabel = t => `<li class="rail-group" aria-hidden="true">${t}</li>`;
-    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" title="${a} in progress">${a}</span><span class="cb done${d ? "" : " zero"}" title="${d} completed">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
+    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" title="${a} in progress">${a}</span><span class="cb done${d ? "" : " zero"}" title="${d} completed">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__mkt" aria-current="${state.current==="__mkt"}"><span>Marketing</span></button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
     const matchQ = c => !q || (c.name+" "+(c.short||"")).toLowerCase().includes(q);
     const rowHtml = c => `<li><button type="button" data-id="${esc(c.id)}" aria-current="${c.id===state.current}"><span class="${/past|referral/i.test(c.stage||"")?"past":""}">${healthDot(c)}${esc(c.short||c.name)}</span><span class="cnts"><span class="cb prog${prog[c.id] ? "" : " zero"}" title="${prog[c.id]||0} in progress">${prog[c.id]||0}</span><span class="cb done${counts[c.id] ? "" : " zero"}" title="${counts[c.id]||0} completed">${counts[c.id]||0}</span></span></button></li>`;
     const pL = prospC.filter(matchQ), aL = activeC.filter(matchQ), oL = otherC.filter(matchQ);
     $("#navList").innerHTML = ov; list.innerHTML = (pL.length ? grpLabel("Prospective") + pL.map(rowHtml).join("") : "") + (aL.length ? grpLabel(`Active in ${cyr}`) + aL.map(rowHtml).join("") : "") + (oL.length ? grpLabel("All other clients") + oL.map(rowHtml).join("") : "");
-    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
-    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __pipeline: "Pipeline", __intel: "Intelligence", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
+    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__mkt"${state.current==="__mkt"?" selected":""}>Marketing</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
+    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __pipeline: "Pipeline", __intel: "Intelligence", __mkt: "Marketing", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
     $("#clientViewBtn").setAttribute("aria-checked", String(state.clientView));
   }
 
@@ -1028,7 +1047,7 @@ button.cal-du.late{cursor:pointer}
 
   function renderMain() {
     const main = $("#main");
-    if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__pipeline" || state.current === "__intel") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else renderOverview(); return; } }
+    if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
     const c = state.clients.find(x => x.id === state.current);
     if (!c) {
       main.innerHTML = state.clients.length
@@ -2606,6 +2625,85 @@ button.cal-du.late{cursor:pointer}
     }
   });
 
+  /* ---------- Marketing: monthly newsletter plan (Sheet tabs Newsletter Issues, Story Bank, Newsletter List) ---------- */
+  const MKT = { data: null, loading: false, err: "", svc: "", copied: "" };
+  const mktFetch = () => gs("getMarketing");
+  const mktObjs = rows => { const r = (rows || []).filter(x => x && x.some(v => String(v || "").trim())); if (!r.length) return []; const h = r[0].map(x => String(x || "").trim().toLowerCase()); return r.slice(1).map(x => { const o = {}; h.forEach((k, i) => { o[k] = x[i] == null ? "" : String(x[i]); }); return o; }); };
+  async function mktLoad(force) {
+    if (MKT.loading || (MKT.data && !force)) return;
+    MKT.loading = true; MKT.err = "";
+    try { const r = await mktFetch(); MKT.data = { issues: mktObjs(r.issues).filter(i => i.id), stories: mktObjs(r.stories).filter(s => s.id), list: mktObjs(r.list).filter(p => p.name || p.email) }; }
+    catch (e) { MKT.err = (e && e.message) || String(e); }
+    MKT.loading = false;
+    if (state.current === "__mkt") renderMain();
+  }
+  const mktDay = d => { const t = new Date(String(d || "") + "T12:00:00"); return isNaN(t) ? String(d || "") : t.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }); };
+  const MKT_ST = { Planned: "planned", Drafting: "active", Ready: "done", Sent: "done", Skipped: "void" };
+  function renderMkt() {
+    const main = $("#main");
+    if (!MKT.data) {
+      main.innerHTML = `<div class="top"><header class="head"><div><h1>Marketing</h1><p class="lede">The monthly newsletter plan.</p></div></header></div>${MKT.err ? `<div class="empty">Couldn't load the marketing plan: ${esc(MKT.err)} <button type="button" class="linkbtn" data-mkt-reload>Try again</button></div>` : `<div class="empty">Loading the marketing plan…</div>`}`;
+      mktLoad(); return;
+    }
+    const { issues, stories, list } = MKT.data;
+    const sById = {}; stories.forEach(s => { sById[s.id] = s; });
+    const cName = id => { const c = state.clients.find(x => x.id === id); return c ? (c.short || c.name) : id; };
+    const iById = {}; issues.forEach(i => { iById[i.id] = i; });
+    const today = calKey(new Date());
+    const next = issues.filter(i => i.status !== "Sent" && i.status !== "Skipped" && String(i["send date"]) >= today).sort((a, b) => String(a["send date"]).localeCompare(String(b["send date"])))[0];
+    const nCheck = stories.filter(s => s["check before use"]).length;
+    const subs = list.filter(p => /^subscribed$/i.test(p.status)).length;
+    const svcs = [...new Set(stories.map(s => s.service).filter(Boolean))].sort();
+    const shown = stories.filter(s => !MKT.svc || s.service === MKT.svc).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    const segs = {}; list.forEach(p => { const k = p.segment || "Other"; segs[k] = (segs[k] || 0) + 1; });
+    const chip = (val, label, on) => `<button type="button" data-mkt-svc="${esc(val)}" aria-pressed="${on}">${esc(label)}</button>`;
+    const issueCard = i => {
+      const ids = String(i.stories || "").split(",").map(x => x.trim()).filter(Boolean);
+      const lead = sById[i["lead story"]];
+      const draft = String(i.draft || "").trim();
+      return `<article class="pj mk-issue" id="mk-${esc(i.id)}">
+        <div class="pj-top"><div><div class="pj-name">${esc(i.month || i.id)}</div><div class="pj-when">Sends ${esc(mktDay(i["send date"]))}</div></div><span class="pill ${MKT_ST[i.status] || "planned"}">${esc(i.status || "Planned")}</span></div>
+        <div class="mk-theme">${esc(i.theme || "")}</div>
+        ${i.subject ? `<div class="mk-line"><small>Subject</small><span>${esc(i.subject)}</span></div>` : ""}
+        ${i.preview ? `<div class="mk-line"><small>Preview text</small><span>${esc(i.preview)}</span></div>` : ""}
+        ${ids.length ? `<ul class="mk-sl">${ids.map(id => { const s = sById[id]; return `<li${id === i["lead story"] ? ` class="lead"` : ""}>${id === i["lead story"] ? `<b>Feature</b> ` : ""}${s ? `${esc(cName(s["client id"]))}: ${esc(s.title)}${s["check before use"] ? ` <span class="mk-warn" title="${esc(s["check before use"])}">check</span>` : ""}` : esc(id)}</li>`; }).join("")}</ul>` : ""}
+        ${i.notes ? `<div class="pj-sum">${esc(i.notes)}</div>` : ""}
+        ${draft ? `<details class="pj-items mk-draft"><summary>Read the draft</summary><div class="mk-acts"><button type="button" class="btn" data-mkt-copy="${esc(i.id)}">${MKT.copied === i.id ? "Copied" : "Copy draft"}</button></div><div class="mk-body">${esc(draft)}</div></details>` : `<div class="pj-next none"><small>Draft</small><span>Not written yet. Ask Claude to draft it from the stories above.</span></div>`}
+      </article>`;
+    };
+    main.innerHTML = `<div class="top"><header class="head"><div style="min-width:0">
+        <h1>Marketing</h1>
+        <p class="lede">A monthly newsletter from Victoria Gillespie to industry partners and potential clients, built from the work VGCG has done. It goes out on the second Tuesday of each month.</p>
+        <div class="in-run">${next ? `Next issue: <b>${esc(next.month)}</b>, ${esc(mktDay(next["send date"]))} · ` : ""}Sending tool not chosen yet <button type="button" class="linkbtn" data-mkt-reload>Refresh</button></div>
+      </div></header>
+      <div class="stats"><div class="stat"><div class="n">${issues.length}</div><div class="l">issues planned</div></div><div class="stat"><div class="n">${stories.length}</div><div class="l">stories in the bank</div></div><div class="stat"><div class="n ${nCheck ? "warn" : ""}">${nCheck}</div><div class="l">stories to check before use</div></div><div class="stat"><div class="n">${subs}<span class="of"> of ${list.length}</span></div><div class="l">on the list confirmed</div></div></div></div>
+      <section class="section"><div class="section-head"><h2>Issue plan</h2><span class="note">${issues.length} issues · feature story first</span></div>
+        <div class="pj-grid">${issues.slice().sort((a, b) => String(a["send date"]).localeCompare(String(b["send date"]))).map(issueCard).join("")}</div></section>
+      <section class="section"><div class="section-head"><h2>Story bank</h2><span class="note">${stories.length} stories from our client work · client names used with care</span></div>
+        <div class="filters">${chip("", "All services", !MKT.svc)}${svcs.map(v => chip(v, v, MKT.svc === v)).join("")}</div>
+        <ul class="in-list">${shown.map(s => { const is = iById[s.issue]; return `<li class="in-row">
+          <div class="in-top"><span class="pill planned">${esc(s.service || "Story")}</span><span class="in-meta">${esc(cName(s["client id"]))} · ${esc(fmtDay(s.date) + " " + String(s.date).slice(0, 4))}</span><span class="in-meta mk-in">${is ? `In the ${esc(is.month)} issue` : "Not in an issue yet"}</span></div>
+          <div class="in-t">${esc(s.title)}</div>
+          <div class="in-s">${esc(s.summary)}</div>
+          ${s["check before use"] ? `<div class="mk-chk"><small>Check before use</small><span>${esc(s["check before use"])}</span></div>` : ""}
+        </li>`; }).join("")}</ul></section>
+      <section class="section"><div class="section-head"><h2>Mailing list</h2><span class="note">${list.length} people · ${Object.entries(segs).map(([k, v]) => `${v} ${esc(k.toLowerCase())}`).join(" · ")}</span></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Organization</th><th>Segment</th><th>Status</th></tr></thead><tbody>
+        ${list.map(p => `<tr><td><b>${esc(p.name)}</b>${p.role ? `<div class="sub">${esc(p.role)}</div>` : ""}${p.email ? `<div class="sub">${esc(p.email)}</div>` : ""}</td><td>${esc(p.organization || "")}</td><td>${esc(p.segment || "")}</td><td>${/^subscribed$/i.test(p.status) ? `<span class="pill done">Subscribed</span>` : `<span class="pill planned">${esc(p.status || "To confirm")}</span>`}</td></tr>`).join("")}
+        </tbody></table></div>
+        <p class="note">Add industry partners and prospects in the Newsletter List tab of the VGCG Client Hub sheet. Change Status to Subscribed once a person is happy to receive it.</p></section>`;
+  }
+  document.addEventListener("click", async e => {
+    if (e.target.closest("[data-mkt-reload]")) { MKT.data = null; MKT.err = ""; renderMain(); mktLoad(true); return; }
+    const sv = e.target.closest("[data-mkt-svc]"); if (sv) { MKT.svc = sv.dataset.mktSvc; renderMain(); return; }
+    const cp = e.target.closest("[data-mkt-copy]");
+    if (cp && MKT.data) {
+      const i = MKT.data.issues.find(x => x.id === cp.dataset.mktCopy); if (!i) return;
+      const text = (i.subject ? "Subject: " + i.subject + "\n" : "") + (i.preview ? "Preview: " + i.preview + "\n\n" : "") + String(i.draft || "");
+      try { await navigator.clipboard.writeText(text); cp.textContent = "Copied"; }
+      catch (err) { const b = cp.closest(".mk-draft").querySelector(".mk-body"); const rg = document.createRange(); rg.selectNodeContents(b); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rg); cp.textContent = "Selected: press copy"; }
+    }
+  });
   /* ---------- Client intelligence (written by the client intelligence analyst) ---------- */
   const INTEL = { signal: "", client: "", status: "open", show: 40, cshow: {} };
   const SIG = { opportunity: ["active", "Opportunity"], risk: ["late", "Risk"], watch: ["planned", "Watch"], info: ["done", "Info"] };
@@ -3358,7 +3456,7 @@ Rules:
     d = Object.assign({}, d, { clients: (d.clients || []).map(c => { const x = Object.assign({}, c); if (x.logoId && logoCache[x.logoId]) x.logo = logoCache[x.logoId]; return x; }) });
     setTimeout(fetchLogos_, 0);
     state.clients = d.clients; state.items = d.items; state.invoices = d.invoices || []; state.overrides = d.overrides || []; state.searches = d.searches || []; state.canEdit = d.canEdit;
-    if (state.current !== "__billing" && state.current !== "__home" && state.current !== "__talent" && state.current !== "__reports" && state.current !== "__calendar" && state.current !== "__pipeline" && state.current !== "__intel" && !state.clients.find(c => c.id === state.current)) state.current = state.clients[0]?.id || null;
+    if (state.current !== "__billing" && state.current !== "__home" && state.current !== "__talent" && state.current !== "__reports" && state.current !== "__calendar" && state.current !== "__pipeline" && state.current !== "__intel" && state.current !== "__mkt" && !state.clients.find(c => c.id === state.current)) state.current = state.clients[0]?.id || null;
     render();
   }
 
@@ -3472,7 +3570,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "e11dadf09f";
+  var BUILD = "307bde2c1b";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
