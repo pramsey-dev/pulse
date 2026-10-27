@@ -3149,7 +3149,7 @@ Rules:
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function (OS) {
     try {
-      await OS.init({ appId: PUSH_APP, serviceWorkerPath: "OneSignalSDKWorker.js", serviceWorkerParam: { scope: "/pulse/" }, notifyButton: { enable: false }, promptOptions: { autoPrompt: false } });
+      await OS.init({ appId: PUSH_APP, serviceWorkerPath: "OneSignalSDKWorker.js", serviceWorkerParam: { scope: location.pathname.replace(/[^/]*$/, "") }, notifyButton: { enable: false }, promptOptions: { autoPrompt: false } });
       window.__pulseOS = OS;
       const me = (typeof calUserEmail === "function" && calUserEmail()) || store.get("pulse.email") || "";
       if (me && OS.Notifications.permission) await OS.login(String(me).toLowerCase());

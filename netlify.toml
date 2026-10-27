@@ -1,0 +1,15 @@
+# Pulse on Netlify: a plain static site, no build step.
+[build]
+  publish = "."
+
+# Internal tool: keep it out of search engines, and keep the version check fresh.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/version.json"
+  [headers.values]
+    Cache-Control = "no-cache"
