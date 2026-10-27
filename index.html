@@ -3247,7 +3247,7 @@ Rules:
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function (OS) {
     try {
-      await OS.init({ appId: PUSH_APP, serviceWorkerPath: "OneSignalSDKWorker.js", serviceWorkerParam: { scope: "/pulse/" }, notifyButton: { enable: false }, promptOptions: { autoPrompt: false } });
+      await OS.init({ appId: PUSH_APP, serviceWorkerPath: "OneSignalSDKWorker.js", serviceWorkerParam: { scope: location.pathname.replace(/[^/]*$/, "") }, notifyButton: { enable: false }, promptOptions: { autoPrompt: false } });
       window.__pulseOS = OS;
       const me = (typeof calUserEmail === "function" && calUserEmail()) || store.get("pulse.email") || "";
       if (me && OS.Notifications.permission) await OS.login(String(me).toLowerCase());
@@ -3570,7 +3570,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "307bde2c1b";
+  var BUILD = "0887b221d2";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
