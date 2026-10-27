@@ -4,13 +4,15 @@
    -> Google Drive "Candidate Resumes/<search>" folder, and its Drive link replaces the
    tracker's Resume link. Candidates that already have a Drive link are skipped. */
 (function () {
+  // Where Pulse is hosted. On switch day, change to the Netlify address and set PATH to ''.
   const ORIG = 'https:/' + '/pramsey-dev.github.io';
+  const PATH = '/pulse';
   const norm = s => String(s || '').toLowerCase().split(',')[0].replace(/\b(dr|mr|mrs|ms|jr|sr|esq|ii|iii|phd|mba)\b\.?/g, '').replace(/[^a-z ]/g, ' ').replace(/\s+/g, ' ').trim();
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const frame = src => { const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;left:-5000px;top:0;width:1200px;height:900px'; f.src = src; document.body.appendChild(f); return f; };
   window.PR = {
     relay: null, log: [], status: 'idle', done: 0, total: 0,
-    open() { this.relay = window.open(ORIG + '/pulse/relay.html?v=' + Date.now(), 'pulseRelay'); return !!this.relay; },
+    open() { this.relay = window.open(ORIG + PATH + '/relay.html?v=' + Date.now(), 'pulseRelay'); return !!this.relay; },
     call(msg, type) {
       return new Promise((res, rej) => {
         const id = Math.random().toString(36).slice(2); msg.id = id;
