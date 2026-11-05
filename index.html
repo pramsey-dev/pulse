@@ -2272,14 +2272,43 @@ button.cal-du.late{cursor:pointer}
 
   /* ---------- Communications log: emails and meetings with client contacts, newest first (internal; hidden in client view) ---------- */
   const commsFetch = id => gs("getComms", id);
-  const COMMS = { by: {}, busy: {}, err: {}, who: {}, type: {}, show: {} };
+  const COMMS = { by: {}, busy: {}, err: {}, who: {}, type: {}, show: {}, at: {}, live: {} };
+  /* saved copy per device: shows instantly, then refreshes in the background */
+  const CM_KEY = "pulse.comms.v1", CM_FRESH = 30 * 60 * 1000;
+  const cmCacheAll = () => { try { return JSON.parse(localStorage.getItem(CM_KEY) || "{}") || {}; } catch (e) { return {}; } };
+  const cmCacheGet = id => cmCacheAll()[id] || null;
+  function cmCachePut(id, rows) {
+    const all = cmCacheAll(); all[id] = { t: Date.now(), rows };
+    try { localStorage.setItem(CM_KEY, JSON.stringify(all)); }
+    catch (e) { try { const k = Object.keys(all).sort((a, b) => all[a].t - all[b].t); while (k.length > 1) { delete all[k.shift()]; try { localStorage.setItem(CM_KEY, JSON.stringify(all)); break; } catch (e2) {} } } catch (e3) {} }
+  }
+  const cmSig = rows => { try { return JSON.stringify(rows); } catch (e) { return String(Math.random()); } };
   async function commsLoad(id, force) {
-    if (!id || COMMS.busy[id] || (!force && COMMS.by[id])) return;
+    if (!id || COMMS.busy[id]) return;
+    if (COMMS.by[id] === undefined) { const c = cmCacheGet(id); if (c && Array.isArray(c.rows)) { COMMS.by[id] = c.rows; COMMS.at[id] = c.t; if (state.current === id) setTimeout(renderMain, 0); } }
+    if (!force && COMMS.live[id]) return;
     COMMS.busy[id] = true;
-    try { COMMS.by[id] = ((await commsFetch(id)) || []).filter(r => r && r.date); COMMS.err[id] = ""; }
-    catch (e) { COMMS.err[id] = `Couldn't load the communications log: ${(e && e.message) || e}`; if (!COMMS.by[id]) COMMS.by[id] = []; }
+    try {
+      const rows = ((await commsFetch(id)) || []).filter(r => r && r.date);
+      const changed = !COMMS.by[id] || cmSig(rows) !== cmSig(COMMS.by[id]);
+      COMMS.by[id] = rows; COMMS.at[id] = Date.now(); COMMS.live[id] = true; COMMS.err[id] = "";
+      cmCachePut(id, rows);
+      COMMS.busy[id] = false;
+      if (changed && state.current === id) renderMain();
+      return;
+    }
+    catch (e) { if (!COMMS.by[id] || !COMMS.by[id].length) COMMS.err[id] = `Couldn't load the communications log: ${(e && e.message) || e}`; if (!COMMS.by[id]) COMMS.by[id] = []; }
     COMMS.busy[id] = false;
     if (state.current === id) renderMain();
+  }
+  /* after Pulse loads, quietly fill the saved copy for current clients, one at a time */
+  let cmWarmed = false;
+  function commsWarm() {
+    if (cmWarmed || state.clientView || !state.clients.length) return; cmWarmed = true;
+    const cache = cmCacheAll();
+    const ids = state.clients.filter(c => /active|prospect/i.test(c.stage || "")).map(c => c.id).filter(id => !COMMS.by[id] && (!cache[id] || Date.now() - cache[id].t > CM_FRESH));
+    const next = () => { const id = ids.shift(); if (!id) return; if (COMMS.by[id] && COMMS.live[id]) return next(); commsLoad(id).finally(() => setTimeout(next, 1500)); };
+    setTimeout(next, 4000);
   }
   const cmMonth = d => { const [y, m] = String(d).split("-"); return MON[+m - 1] + " " + y; };
   function commsSection(c) {
@@ -3318,7 +3347,7 @@ Rules:
     const t = setInterval(() => { const el = document.querySelector(`.rail [data-id="${CSS.escape(c)}"]`); if (el) { clearInterval(t); el.click(); } else if (++n > 40) clearInterval(t); }, 500);
   })();
 
-  function render(){ renderRail(); renderMain(); chatSync(); }
+  function render(){ renderRail(); renderMain(); chatSync(); try { commsWarm(); } catch (e) {} }
 
   function openItem(item) {
     const c = state.clients.find(x => x.id === (item && item.client ? item.client : state.current)); if (!c) return;
@@ -3384,7 +3413,7 @@ Rules:
   function signOut(tellServer) {
     const t = store.get("pulse.token");
     if (tellServer && t) call("logout").catch(() => {});
-    store.del("pulse.token"); store.del("pulse.hub");
+    store.del("pulse.token"); store.del("pulse.hub"); store.del("pulse.comms.v1");
     state.clients = []; state.items = []; state.invoices = []; state.overrides = []; state.searches = [];
     $("#main").innerHTML = ""; $("#clientList").innerHTML = ""; $("#navList").innerHTML = "";
     gate("login");
@@ -3570,7 +3599,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "0887b221d2";
+  var BUILD = "4f0f09dba0";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
