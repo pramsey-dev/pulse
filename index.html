@@ -768,6 +768,7 @@ button.cal-du.late{cursor:pointer}
 .push-actions{display:flex;justify-content:space-between;align-items:center}
 .push-msg{margin:0;font-size:13.5px;color:var(--accent)}
 
+.push-key{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px}.push-key-row{display:flex;gap:8px}.push-key-row input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font-size:16px}
 .hdot{display:inline-block;flex:none;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px;background:var(--line)}
 .hdot.ok{background:#1d8a52}
 .hdot.watch{background:#d99a20}
@@ -3301,6 +3302,8 @@ Rules:
     const deviceOn = !!(perm && OS && OS.User && OS.User.PushSubscription && OS.User.PushSubscription.optedIn);
     d.innerHTML = `<form method="dialog" class="push-in">
       <h2>Notifications</h2>
+      ${PUSH.keyNeeded ? `<div class="push-key"><b>One-time setup: OneSignal key</b><div class="sub">In OneSignal, open the pulse app, go to Settings, then Keys &amp; IDs, tap Add Key, copy it and paste it here. Only you see this box, and it disappears once the key is saved.</div>
+        <div class="push-key-row"><input type="password" id="pushKeyIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="os_v2_app_…" aria-label="OneSignal key"><button type="button" class="btn primary" data-push="key">Save key</button></div></div>` : ""}
       ${needHome ? `<p class="push-note">On iPhone and iPad, notifications only work from the Pulse app on your Home Screen. In Safari, tap <b>Share</b> → <b>Add to Home Screen</b>, open Pulse from the new icon, sign in, and come back here.</p>`
         : !supported ? `<p class="push-note">${esc(PUSH.msg || "This browser can't receive notifications. Try Chrome, Edge, Firefox or Safari.")}</p>`
         : `<div class="push-row"><div><b>This device</b><div class="sub">${deviceOn ? "Notifications are on here." : perm ? "Allowed, but turned off for Pulse." : "Not turned on yet."}</div></div>
@@ -3316,6 +3319,7 @@ Rules:
   async function pushOpen() {
     const d = pushDialog(); PUSH.msg = "";
     if (!PUSH.prefs) { try { PUSH.prefs = await gs("getPushPrefs"); } catch (e) { PUSH.prefs = { on: false }; PUSH.msg = (e && e.message) || "Couldn't load your settings."; } }
+    try { PUSH.keyNeeded = !!(await gs("pushKeyNeeded")); } catch (e) { PUSH.keyNeeded = false; }
     pushRender(); if (!d.open) d.showModal();
   }
   async function pushSave() { try { PUSH.prefs = await gs("savePushPrefs", PUSH.prefs); } catch (e) { PUSH.msg = (e && e.message) || "Couldn't save."; } pushRender(); }
@@ -3334,6 +3338,10 @@ Rules:
         } else PUSH.msg = ok === false ? "Notifications were blocked. Allow them for this site in your browser or phone settings, then try again." : "Notifications weren't allowed.";
       } else if (b.dataset.push === "off") {
         await OS.User.PushSubscription.optOut(); PUSH.msg = "Turned off on this device.";
+      } else if (b.dataset.push === "key") {
+        const inp = document.getElementById("pushKeyIn"), k = inp ? inp.value.trim() : "";
+        if (!k) PUSH.msg = "Paste the key first.";
+        else { await gs("savePushKey", k); if (inp) inp.value = ""; PUSH.keyNeeded = false; PUSH.msg = "Key saved. Now turn on notifications here and send yourself a test."; }
       } else if (b.dataset.push === "test") {
         const r = await gs("testPush"); PUSH.msg = r ? "Test sent. It should arrive in a few seconds." : "Couldn't send the test. Check that both OneSignal keys are saved in the script settings.";
       }
@@ -3599,7 +3607,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "4f0f09dba0";
+  var BUILD = "e23bc33884";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
