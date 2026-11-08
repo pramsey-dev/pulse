@@ -250,6 +250,18 @@ a.qb:hover{text-decoration-color:currentColor}
 .hero .l{font-size:12.5px;color:var(--muted);margin-top:4px}
 .hero .h,.lone .h{margin:0 0 8px}
 .lone .l{margin-top:4px}
+/* page scrollers: long lists scroll inside their own box so the page stays short */
+#main[data-page="__billing"] .tbl-wrap,#main[data-page="__mkt"] .tbl-wrap{max-height:520px;overflow:auto;overscroll-behavior:contain}
+#main[data-page="__billing"] .tbl thead th,#main[data-page="__mkt"] .tbl thead th{position:sticky;top:0;z-index:1;background:var(--surface)}
+#main[data-page="__billing"] .plist{max-height:420px;overflow-y:auto;overscroll-behavior:contain}
+.in-list{max-height:70vh;overflow-y:auto;overscroll-behavior:contain}
+.pp-col{max-height:72vh;overflow-y:auto;overscroll-behavior:contain}
+.pp-col-h{position:sticky;top:-10px;z-index:1;background:var(--surface);margin:-10px -10px 0;padding:12px 14px 6px}
+@media (max-width:1100px){.pp-board{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;overscroll-behavior-x:contain}.pp-board>.pp-col{flex:0 0 280px;scroll-snap-align:start}}
+@media (max-width:560px){.pp-board>.pp-col{flex-basis:82vw}}
+.pj-grid:has(.mk-issue){display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;overscroll-behavior-x:contain}
+.pj-grid:has(.mk-issue)>.mk-issue{flex:0 0 340px;scroll-snap-align:start}
+@media (max-width:560px){.pj-grid:has(.mk-issue)>.mk-issue{flex-basis:84vw}}
 .home-flow{display:flex;flex-direction:column;gap:28px;min-width:0}
 .home-flow>.cal-strip{margin:0}
 .hcards.hscroll{display:flex;flex-wrap:nowrap;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:2px 2px 10px;scrollbar-width:thin;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
@@ -1057,6 +1069,7 @@ button.cal-du.late{cursor:pointer}
   }
 
   function renderMain() {
+    { const mm = document.getElementById("main"); if (mm) mm.dataset.page = state.current || ""; }
     const main = $("#main");
     if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
     const c = state.clients.find(x => x.id === state.current);
@@ -3614,7 +3627,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "901ddcc246";
+  var BUILD = "404db3694f";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
