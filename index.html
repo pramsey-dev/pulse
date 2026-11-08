@@ -254,13 +254,14 @@ a.qb:hover{text-decoration-color:currentColor}
 #main[data-kind="client"]{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-content:start;align-items:start}
 #main[data-kind="client"]>.col-left{display:contents}
 #main[data-kind="client"]>.top{order:0;grid-column:1/-1}
-#main[data-kind="client"] .col-left>.stats{order:1;grid-column:1/-1}
-#main[data-kind="client"] .col-left>.section:has(>.pj-grid){order:2;grid-column:1/-1}
+#main[data-kind="client"] .col-left>*{order:6}
+#main[data-kind="client"] .col-left>.cp-stats{order:1;grid-column:1/-1}
+#main[data-kind="client"] .col-left>.cp-projects{order:2;grid-column:1/-1}
 #main[data-kind="client"] .col-left>.in-sec{order:4}
 #main[data-kind="client"] .col-left>.cm{order:5}
 #main[data-kind="client"]>.col-right{order:3}
-#main[data-kind="client"] .col-left>.section:has(>.tbl-wrap):not(:has(>.stats)){order:6}
-#main[data-kind="client"] .col-left>.section:has(>.stats){order:7}
+#main[data-kind="client"] .col-left>.cp-contracts{order:7}
+#main[data-kind="client"] .col-left>.cp-fin{order:8}
 #main[data-kind="client"] .col-right .section-head{position:static;background:none;padding:0}
 #main[data-kind="client"] .pj-grid{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;overscroll-behavior-x:contain}
 #main[data-kind="client"] .pj-grid>.pj{flex:0 0 340px;scroll-snap-align:start}
@@ -268,7 +269,7 @@ a.qb:hover{text-decoration-color:currentColor}
 #main[data-kind="client"] .timeline{max-height:75vh;overflow-y:auto;overscroll-behavior:contain;padding-right:6px}
 #main[data-kind="client"] .timeline .month-label{top:0;background:var(--bg);z-index:1}
 #main[data-kind="client"] .cm-list,#main[data-kind="client"] .in-list{max-height:60vh;overflow-y:auto;overscroll-behavior:contain}
-#main[data-kind="client"] .section:has(>.pj-grid)>.plist{max-height:440px;overflow-y:auto;overscroll-behavior:contain}
+#main[data-kind="client"] .cp-projects>.plist{max-height:440px;overflow-y:auto;overscroll-behavior:contain}
 #main[data-kind="client"] .tbl-wrap{max-height:440px;overflow:auto;overscroll-behavior:contain}
 #main[data-kind="client"] .tbl thead th{position:sticky;top:0;z-index:1;background:var(--surface)}
 #main[data-kind="client"]>.col-right{min-width:0;padding:0;overflow:visible;height:auto}
@@ -276,7 +277,8 @@ a.qb:hover{text-decoration-color:currentColor}
   #main[data-kind="client"]{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:32px}
   #main[data-kind="client"]>.col-right{grid-column:1;grid-row:span 2}
   #main[data-kind="client"] .col-left>.in-sec,#main[data-kind="client"] .col-left>.cm{grid-column:2}
-  #main[data-kind="client"] .col-left>.section:has(>.tbl-wrap){grid-column:1/-1}
+  #main[data-kind="client"] .col-left>*{grid-column:1/-1}
+  #main[data-kind="client"] .col-left>.in-sec,#main[data-kind="client"] .col-left>.cm{grid-column:2}
 }
 @media (min-width:1400px){#main[data-kind="client"]{overflow-y:auto;grid-template-rows:none;padding-bottom:28px}}
 /* page scrollers: long lists scroll inside their own box so the page stays short */
@@ -1145,7 +1147,7 @@ button.cal-du.late{cursor:pointer}
       </div>`; })()}</div>
       <div class="col-left">
 
-      <div class="stats">
+      <div class="stats cp-stats">
         <div class="stat"><div class="n">${months}</div><div class="l">months working together</div></div>
         <div class="stat"><div class="n">${wsList.length}</div><div class="l">projects (${activeWs} active)</div></div>
         <div class="stat"><div class="n">${delivered}</div><div class="l">deliverables completed</div></div>
@@ -1241,18 +1243,18 @@ button.cal-du.late{cursor:pointer}
         const extra = (showMoney && fees.__none ? `<div class="prow tot muted"><div class="pn">Other fees not tied to a project</div><div class="pr"><div class="n">${money0(fees.__none)}</div><div class="l">${cnt.__none} invoice${cnt.__none===1?"":"s"}</div></div></div>` : "")
           + (showMoney && travel ? `<div class="prow tot muted"><div class="pn">Travel &amp; expenses (pass-through)</div><div class="pr"><div class="n">${money0(travel)}</div><div class="l">${b.inv.filter(i=>i.kind==="travel").length} invoices</div></div></div>` : "")
           + (showMoney && b.inv.length ? `<div class="prow tot"><div class="pn">Total billed</div><div class="pr"><div class="n">${money0(feeTot + travel)}</div><div class="l">${money0(feeTot)} fees</div></div></div>` : "");
-        return `<section class="section">
+        return `<section class="section cp-projects">
         <div class="section-head"><h2>Everything we've done</h2><span class="note">${liveP.length + pastP.length} project${liveP.length + pastP.length===1?"":"s"}${openProps.length + lostProps.length ? ` · ${openProps.length + lostProps.length} proposal${openProps.length + lostProps.length === 1 ? "" : "s"} not converted` : ""}${showMoney?" · revenue is fees invoiced to each project":""} · ${state.ws==="all" ? "select one to filter the record" : `<button type="button" class="linkbtn" data-ws="all">show all work</button>`}</span></div>
         ${liveP.length ? `<div class="pj-grid">${liveP.map(card).join("")}</div>` : ""}${openProps.length || lostProps.length ? `<div class="plist-h">Proposals not converted</div><div class="pj-grid">${openProps.map(propCard).join("")}${lostProps.map(propCard).join("")}</div>` : ""}${pastP.length && liveP.length ? `<div class="plist-h">Completed</div>` : ""}${pastP.length || extra ? `<div class="plist">${pastP.map(row).join("")}${extra}</div>` : ""}${!projs2.length ? `<div class="plist"><div class="prow tot muted"><div class="pn">No projects yet</div></div></div>` : ""}
       </section>`;
       })()}
 
-      ${(() => { if (state.clientView) return ""; const cts = items.filter(i => i.kind==="contract" && (state.ws==="all" || i.ws===state.ws)).sort((x,y) => (y.contract?.sent||y.date).localeCompare(x.contract?.sent||x.date)); if (!cts.length) return ""; const ex = cts.filter(i => ctState(i)[0]==="done").length; return `<section class="section">
+      ${(() => { if (state.clientView) return ""; const cts = items.filter(i => i.kind==="contract" && (state.ws==="all" || i.ws===state.ws)).sort((x,y) => (y.contract?.sent||y.date).localeCompare(x.contract?.sent||x.date)); if (!cts.length) return ""; const ex = cts.filter(i => ctState(i)[0]==="done").length; return `<section class="section cp-contracts">
         <div class="section-head"><h2>Contracts</h2><span class="note">From DocuSign · ${ex} of ${cts.length} executed${state.ws!=="all"?" · this project":""} · internal only</span></div>
         ${contractsTable(cts, false)}
       </section>`; })()}
 
-      ${(!state.clientView && b.inv.length) ? `<section class="section">
+      ${(!state.clientView && b.inv.length) ? `<section class="section cp-fin">
         <div class="section-head"><h2>Financial history</h2><span class="note">From QuickBooks · internal only</span></div>
         <div class="stats">
           <div class="stat"><div class="n">${money0(b.billed)}</div><div class="l">billed since ${esc(fmtMonth(b.first))}</div></div>
@@ -3656,7 +3658,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "79172a8029";
+  var BUILD = "a0c42c662c";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
