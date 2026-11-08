@@ -250,6 +250,35 @@ a.qb:hover{text-decoration-color:currentColor}
 .hero .l{font-size:12.5px;color:var(--muted);margin-top:4px}
 .hero .h,.lone .h{margin:0 0 8px}
 .lone .l{margin-top:4px}
+/* client pages: one scrolling page, sections placed on a grid, long lists in their own scroll boxes */
+#main[data-kind="client"]{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-content:start;align-items:start}
+#main[data-kind="client"]>.col-left{display:contents}
+#main[data-kind="client"]>.top{order:0;grid-column:1/-1}
+#main[data-kind="client"] .col-left>.stats{order:1;grid-column:1/-1}
+#main[data-kind="client"] .col-left>.section:has(>.pj-grid){order:2;grid-column:1/-1}
+#main[data-kind="client"] .col-left>.in-sec{order:4}
+#main[data-kind="client"] .col-left>.cm{order:5}
+#main[data-kind="client"]>.col-right{order:3}
+#main[data-kind="client"] .col-left>.section:has(>.tbl-wrap):not(:has(>.stats)){order:6}
+#main[data-kind="client"] .col-left>.section:has(>.stats){order:7}
+#main[data-kind="client"] .col-right .section-head{position:static;background:none;padding:0}
+#main[data-kind="client"] .pj-grid{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;overscroll-behavior-x:contain}
+#main[data-kind="client"] .pj-grid>.pj{flex:0 0 340px;scroll-snap-align:start}
+@media (max-width:560px){#main[data-kind="client"] .pj-grid>.pj{flex-basis:84vw}}
+#main[data-kind="client"] .timeline{max-height:75vh;overflow-y:auto;overscroll-behavior:contain;padding-right:6px}
+#main[data-kind="client"] .timeline .month-label{top:0;background:var(--bg);z-index:1}
+#main[data-kind="client"] .cm-list,#main[data-kind="client"] .in-list{max-height:60vh;overflow-y:auto;overscroll-behavior:contain}
+#main[data-kind="client"] .section:has(>.pj-grid)>.plist{max-height:440px;overflow-y:auto;overscroll-behavior:contain}
+#main[data-kind="client"] .tbl-wrap{max-height:440px;overflow:auto;overscroll-behavior:contain}
+#main[data-kind="client"] .tbl thead th{position:sticky;top:0;z-index:1;background:var(--surface)}
+#main[data-kind="client"]>.col-right{min-width:0;padding:0;overflow:visible;height:auto}
+@media (min-width:1300px){
+  #main[data-kind="client"]{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:32px}
+  #main[data-kind="client"]>.col-right{grid-column:1;grid-row:span 2}
+  #main[data-kind="client"] .col-left>.in-sec,#main[data-kind="client"] .col-left>.cm{grid-column:2}
+  #main[data-kind="client"] .col-left>.section:has(>.tbl-wrap){grid-column:1/-1}
+}
+@media (min-width:1400px){#main[data-kind="client"]{overflow-y:auto;grid-template-rows:none;padding-bottom:28px}}
 /* page scrollers: long lists scroll inside their own box so the page stays short */
 #main[data-page="__billing"] .tbl-wrap,#main[data-page="__mkt"] .tbl-wrap{max-height:520px;overflow:auto;overscroll-behavior:contain}
 #main[data-page="__billing"] .tbl thead th,#main[data-page="__mkt"] .tbl thead th{position:sticky;top:0;z-index:1;background:var(--surface)}
@@ -1069,7 +1098,7 @@ button.cal-du.late{cursor:pointer}
   }
 
   function renderMain() {
-    { const mm = document.getElementById("main"); if (mm) mm.dataset.page = state.current || ""; }
+    { const mm = document.getElementById("main"); if (mm) { mm.dataset.page = state.current || ""; mm.dataset.kind = state.clients.some(c => c.id === state.current) ? "client" : ""; } }
     const main = $("#main");
     if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
     const c = state.clients.find(x => x.id === state.current);
@@ -2381,7 +2410,7 @@ button.cal-du.late{cursor:pointer}
   /* ---------- Collapsible sections: every section heading toggles its section; choices remembered per browser ---------- */
   (function () {
     const KEY = "pulse.collapsed.v1";
-    const LONG = ["communications", "record of work", "everything we've done", "work delivered", "invoices", "open invoices", "by client"];
+    const LONG = ["work delivered", "invoices", "open invoices"];
     let st = {}; try { st = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { st = {}; }
     const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
     const keyOf = h => (h.textContent || "").replace(/\s+/g, " ").trim().toLowerCase().replace(/\d+/g, "#");
@@ -3627,7 +3656,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "404db3694f";
+  var BUILD = "79172a8029";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
