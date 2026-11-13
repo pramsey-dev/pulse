@@ -13,3 +13,14 @@
   for = "/version.json"
   [headers.values]
     Cache-Control = "no-cache"
+
+# Public booking pages: /book and /book/<meeting-type> serve book.html.
+[[redirects]]
+  from = "/book"
+  to = "/book.html"
+  status = 200
+
+[[redirects]]
+  from = "/book/*"
+  to = "/book.html"
+  status = 200

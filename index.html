@@ -210,6 +210,26 @@ a.qb:hover{text-decoration-color:currentColor}
 .prow.tot{cursor:default;background:var(--bg-soft,transparent)}
 .prow.tot .pn{font-weight:600}
 .prow.muted .pn{color:var(--muted);font-weight:500}
+.sc-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.sc-types{display:grid;gap:12px}
+.sc-type{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px;display:grid;gap:10px;background:var(--surface)}
+.sc-type label,.sc-rules label,.sc-tz,#main[data-page="__sched"] section>label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.sc-type input,.sc-type select,.sc-rules input,.sc-tz select,.sc-day input,#main[data-page="__sched"] section>label input,.sc-client{font:inherit;font-size:14px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--bg)}
+.sc-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.sc-row label{min-width:110px}.sc-grow{flex:1 1 220px}
+.sc-type .sc-check,.sc-day .sc-check{display:flex;flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:14px}
+.sc-link{font-size:13px;color:var(--muted)}.sc-link .mono{font:12px var(--f-mono);overflow-wrap:anywhere}
+.sc-hours{display:grid;gap:8px}
+.sc-day{display:grid;grid-template-columns:150px 130px auto 130px;justify-content:start;gap:10px;align-items:center;font-size:14px}
+.sc-day .note{grid-column:2/5}
+.sc-tz{max-width:280px}
+.sc-rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
+.sc-rules .note,#main[data-page="__sched"] section>label .note{font-size:12px}
+.sc-save{position:sticky;bottom:0;z-index:2;margin-top:10px;display:flex;gap:14px;align-items:center;padding:12px 0;background:var(--bg);border-top:1px solid var(--line)}
+.sc-save .err{color:#b3261e;font-size:13px}
+.sc-st{font-size:12px;color:#b3261e;text-transform:capitalize}
+.sc-notes{white-space:pre-wrap;max-width:46ch}
+@media (max-width:760px){.sc-day{grid-template-columns:1fr 110px auto 110px}}
 .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 @media (max-width:640px){.prow{grid-template-columns:1fr}.prow .pr{grid-column:1;grid-row:auto;text-align:left;display:flex;gap:8px;align-items:baseline}}
 .tbl td .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
@@ -1079,13 +1099,13 @@ button.cal-du.late{cursor:pointer}
     const otherC = state.clients.filter(c => !isActive(c) && !isProsp(c)).sort((a,b) => billedTot(b.id) - billedTot(a.id) || nm(a).localeCompare(nm(b)));
     const sorted = [...prospC, ...activeC, ...otherC];
     const grpLabel = t => `<li class="rail-group" aria-hidden="true">${t}</li>`;
-    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" title="${a} in progress">${a}</span><span class="cb done${d ? "" : " zero"}" title="${d} completed">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__mkt" aria-current="${state.current==="__mkt"}"><span>Marketing</span></button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
+    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" title="${a} in progress">${a}</span><span class="cb done${d ? "" : " zero"}" title="${d} completed">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__sched" aria-current="${state.current==="__sched"}"><span>Scheduling</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__mkt" aria-current="${state.current==="__mkt"}"><span>Marketing</span></button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
     const matchQ = c => !q || (c.name+" "+(c.short||"")).toLowerCase().includes(q);
     const rowHtml = c => `<li><button type="button" data-id="${esc(c.id)}" aria-current="${c.id===state.current}"><span class="${/past|referral/i.test(c.stage||"")?"past":""}">${healthDot(c)}${esc(c.short||c.name)}</span><span class="cnts"><span class="cb prog${prog[c.id] ? "" : " zero"}" title="${prog[c.id]||0} in progress">${prog[c.id]||0}</span><span class="cb done${counts[c.id] ? "" : " zero"}" title="${counts[c.id]||0} completed">${counts[c.id]||0}</span></span></button></li>`;
     const pL = prospC.filter(matchQ), aL = activeC.filter(matchQ), oL = otherC.filter(matchQ);
     $("#navList").innerHTML = ov; list.innerHTML = (pL.length ? grpLabel("Prospective") + pL.map(rowHtml).join("") : "") + (aL.length ? grpLabel(`Active in ${cyr}`) + aL.map(rowHtml).join("") : "") + (oL.length ? grpLabel("All other clients") + oL.map(rowHtml).join("") : "");
-    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__mkt"${state.current==="__mkt"?" selected":""}>Marketing</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
-    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __pipeline: "Pipeline", __intel: "Intelligence", __mkt: "Marketing", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
+    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__sched"${state.current==="__sched"?" selected":""}>Scheduling</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__mkt"${state.current==="__mkt"?" selected":""}>Marketing</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
+    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __sched: "Scheduling", __pipeline: "Pipeline", __intel: "Intelligence", __mkt: "Marketing", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
     $("#clientViewBtn").setAttribute("aria-checked", String(state.clientView));
   }
 
@@ -1102,7 +1122,7 @@ button.cal-du.late{cursor:pointer}
   function renderMain() {
     { const mm = document.getElementById("main"); if (mm) { mm.dataset.page = state.current || ""; mm.dataset.kind = state.clients.some(c => c.id === state.current) ? "client" : ""; } }
     const main = $("#main");
-    if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
+    if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__sched" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__sched") renderSched(); else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
     const c = state.clients.find(x => x.id === state.current);
     if (!c) {
       main.innerHTML = state.clients.length
@@ -2856,6 +2876,113 @@ button.cal-du.late{cursor:pointer}
     const a = e.target.closest("[data-in-all]"); if (a) { INTEL.cshow[a.dataset.inAll] = true; renderMain(); }
   });
   document.addEventListener("change", e => { const s = e.target.closest && e.target.closest("[data-in-client]"); if (s) { INTEL.client = s.value; INTEL.show = 40; renderMain(); } });
+  /* ---------- Scheduling: VGCG booking pages (server: tools/booking-server.gs) ---------- */
+  const SCHED = { data: null, loading: false, err: "", flash: "", tab: "bookings", past: false, draft: null, saving: false };
+  const SCHED_DOW = [["1", "Monday"], ["2", "Tuesday"], ["3", "Wednesday"], ["4", "Thursday"], ["5", "Friday"], ["6", "Saturday"], ["7", "Sunday"]];
+  function schedLoad(force) {
+    if (SCHED.loading || (SCHED.data && !force)) return;
+    SCHED.loading = true; SCHED.err = "";
+    call("bkAdminGet").then(d => { SCHED.data = d; SCHED.draft = null; }).catch(e => {
+      const m = e.message || String(e);
+      SCHED.err = /Unknown|not a function|not defined|bkAdmin/i.test(m) ? "Scheduling isn't switched on on the Pulse server yet. Add booking-server.gs to the server (steps are at the top of that file), then refresh." : m;
+    }).finally(() => { SCHED.loading = false; if (state.current === "__sched") renderMain(); });
+  }
+  const schedDraft = () => SCHED.draft || (SCHED.draft = JSON.parse(JSON.stringify({ settings: SCHED.data.settings, types: SCHED.data.types })));
+  const schedBase = () => String((SCHED.data && SCHED.data.settings.publicUrl) || "").replace(/\/$/, "");
+  const schedWhen = iso => { const d = new Date(iso); return isNaN(d) ? "—" : d.toLocaleString("en-US", { timeZone: (SCHED.data && SCHED.data.settings.tz) || "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }); };
+  function renderSched() {
+    const main = $("#main"); schedLoad(false);
+    const head = `<div class="top"><header class="head"><div style="min-width:0"><h1>Scheduling</h1>
+        <p class="lede">VGCG's own booking pages. People pick an open time on your calendar; Pulse books it with a Zoom link and sends a VGCG-branded confirmation. Set meeting types and working hours here.</p></div>
+        <div class="cal-acts"><button type="button" class="btn" data-sc="refresh">Refresh</button>${SCHED.data ? `<button type="button" class="btn primary" data-sc-copy="${esc(schedBase())}">Copy booking link</button>` : ""}</div></header>
+        ${SCHED.flash ? `<div class="banner cal-flash" role="status">${esc(SCHED.flash)}</div>` : ""}`;
+    if (!SCHED.data) { main.innerHTML = head + `<div class="empty">${esc(SCHED.err || "Loading scheduling…")}</div></div>`; return; }
+    const d = SCHED.data, now = Date.now();
+    const up = d.bookings.filter(b => b.status === "confirmed" && Date.parse(b.end) >= now).sort((a, b) => a.start.localeCompare(b.start));
+    const wk = up.filter(b => Date.parse(b.start) < now + 7 * 864e5).length;
+    const last30 = d.bookings.filter(b => Date.parse(b.created) >= now - 30 * 864e5).length;
+    const tabs = [["bookings", "Bookings"], ["types", "Meeting types"], ["hours", "Availability"]].map(([k, l]) => `<button type="button" class="btn" data-sc-tab="${k}" aria-pressed="${SCHED.tab === k}">${l}</button>`).join("");
+    let body = "";
+    if (SCHED.tab === "bookings") {
+      const list = SCHED.past ? d.bookings.filter(b => !(b.status === "confirmed" && Date.parse(b.end) >= now)).sort((a, b) => b.start.localeCompare(a.start)) : up;
+      const tname = s => (d.types.find(t => t.slug === s) || { name: s }).name;
+      const clientSel = b => `<select class="sc-client" data-sc-client="${esc(b.id)}" aria-label="Client for ${esc(b.name)}"><option value="">No client</option>${state.clients.slice().sort((x, y) => (x.short || x.name).localeCompare(y.short || y.name)).map(c => `<option value="${esc(c.id)}"${c.id === b.client ? " selected" : ""}>${esc(c.short || c.name)}</option>`).join("")}</select>`;
+      body = `<section class="section"><div class="section-head"><h2>${SCHED.past ? "Past and cancelled" : "Upcoming"}</h2><button type="button" class="linkbtn" data-sc-past>${SCHED.past ? "Show upcoming" : "Show past and cancelled"}</button></div>
+        ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>Meeting</th><th>Who</th><th>Client</th><th></th></tr></thead><tbody>${list.map(b => `<tr><td>${esc(schedWhen(b.start))}${b.visitorTz && b.visitorTz !== d.settings.tz ? `<div class="sub">their zone: ${esc(b.visitorTz.replace(/_/g, " "))}</div>` : ""}</td><td>${esc(tname(b.type))}${b.status !== "confirmed" ? ` <span class="sc-st">${esc(b.status)}</span>` : ""}</td><td><b>${esc(b.name)}</b>${b.org ? ` · ${esc(b.org)}` : ""}<div class="sub"><a href="mailto:${esc(b.email)}">${esc(b.email)}</a></div>${b.notes ? `<div class="sub sc-notes">${esc(b.notes)}</div>` : ""}</td><td>${clientSel(b)}</td><td>${b.status === "confirmed" && Date.parse(b.start) > now && state.canEdit ? `<button type="button" class="linkbtn" data-sc-cancel="${esc(b.id)}">Cancel</button>` : ""}</td></tr>`).join("")}</tbody></table></div>`
+          : `<div class="empty">${SCHED.past ? "No past bookings in the last four months." : "No upcoming bookings. Share your booking link to get some."}</div>`}</section>`;
+    } else if (SCHED.tab === "types") {
+      const dr = schedDraft();
+      body = `<section class="section"><div class="section-head"><h2>Meeting types</h2><span class="note">Each type gets its own link. Turn one off to hide it without deleting it.</span></div>
+        <div class="sc-types">${dr.types.map((t, i) => `<div class="sc-type" data-i="${i}">
+          <div class="sc-row"><label class="sc-grow">Name<input data-tf="name" value="${esc(t.name)}" maxlength="80"></label><label>Minutes<input data-tf="minutes" type="number" min="5" max="480" step="5" value="${esc(t.minutes)}"></label>
+          <label>Zoom<select data-tf="zoom">${[["phil", "Phil's Zoom"], ["victoria", "Victoria's Zoom"], ["none", "No link"]].map(([v, l]) => `<option value="${v}"${t.zoom === v ? " selected" : ""}>${l}</option>`).join("")}</select></label>
+          <label class="sc-check"><input data-tf="active" type="checkbox"${t.active ? " checked" : ""}> Bookable</label></div>
+          <label>Description<input data-tf="description" value="${esc(t.description || "")}" maxlength="600"></label>
+          <label>Question on the booking form<input data-tf="question" value="${esc(t.question || "")}" maxlength="200" placeholder="Anything we should know?"></label>
+          <div class="sc-link">${t.slug ? `<span class="mono">${esc(schedBase())}/${esc(t.slug)}</span> <button type="button" class="linkbtn" data-sc-copy="${esc(schedBase() + "/" + t.slug)}">Copy</button> · <a href="${esc(schedBase() + "/" + t.slug)}" target="_blank" rel="noopener">Open</a> · ` : `<span class="note">Link is created when you save.</span> · `}<button type="button" class="linkbtn" data-sc-deltype="${i}">Remove</button></div>
+        </div>`).join("")}</div>
+        <div style="padding:2px 0 8px"><button type="button" class="btn" data-sc-addtype>+ Add meeting type</button></div></section>`;
+    } else {
+      const s = schedDraft().settings, num = (k, l, h) => `<label>${l}<input data-sf="${k}" type="number" min="0" value="${esc(s[k])}">${h ? `<span class="note">${h}</span>` : ""}</label>`;
+      body = `<section class="section"><div class="section-head"><h2>Working hours</h2><span class="note">Open times are these hours minus anything already on your calendar.</span></div>
+        <label class="sc-tz">Your time zone<select data-sf="tz">${CAL_TZ.map(([v, l]) => `<option value="${v}"${v === s.tz ? " selected" : ""}>${l}</option>`).join("")}</select></label>
+        <div class="sc-hours">${SCHED_DOW.map(([k, l]) => { const w = (s.hours[k] || [])[0]; return `<div class="sc-day"><label class="sc-check"><input type="checkbox" data-sh-on="${k}"${w ? " checked" : ""}> ${l}</label>${w ? `<input type="time" step="900" data-sh="${k}" data-sh-i="0" value="${esc(w[0])}" aria-label="${l} start"><span>to</span><input type="time" step="900" data-sh="${k}" data-sh-i="1" value="${esc(w[1])}" aria-label="${l} end">` : `<span class="note">Unavailable</span>`}</div>`; }).join("")}</div></section>
+        <section class="section"><div class="section-head"><h2>Booking rules</h2></div><div class="sc-rules">
+          ${num("bufferMin", "Buffer (minutes)", "kept free before and after meetings")}${num("noticeHours", "Minimum notice (hours)")}${num("daysAhead", "Book up to (days ahead)")}${num("dailyMax", "Most bookings per day", "0 means no limit")}${num("increment", "Start times every (minutes)")}</div>
+          <label>Days off<input data-sf="blackout" value="${esc((s.blackout || []).join(", "))}" placeholder="2026-12-24, 2026-12-25"><span class="note">Dates as YYYY-MM-DD, separated by commas</span></label></section>
+        <section class="section"><div class="section-head"><h2>Links</h2></div><div class="sc-rules">
+          <label>Phil's Zoom<input data-sz="phil" value="${esc((s.zoom || {}).phil || "")}"></label><label>Victoria's Zoom<input data-sz="victoria" value="${esc((s.zoom || {}).victoria || "")}"></label>
+          <label class="sc-grow">Public booking address<input data-sf="publicUrl" value="${esc(s.publicUrl)}"></label></div></section>`;
+    }
+    const dirty = SCHED.draft && JSON.stringify({ settings: SCHED.data.settings, types: SCHED.data.types }) !== JSON.stringify(SCHED.draft);
+    main.innerHTML = head + `<div class="stats"><div class="stat"><div class="n">${up.length}</div><div class="l">upcoming bookings</div></div><div class="stat"><div class="n">${wk}</div><div class="l">in the next 7 days</div></div><div class="stat"><div class="n">${last30}</div><div class="l">booked in the last 30 days</div></div><div class="stat"><div class="n">${d.types.filter(t => t.active).length}</div><div class="l">meeting types live</div></div></div>
+      <div class="filters sc-tabs">${tabs}</div>${body}
+      ${SCHED.tab !== "bookings" && state.canEdit ? `<div class="sc-save"><button type="button" class="btn primary" data-sc-save${dirty && !SCHED.saving ? "" : " disabled"}>${SCHED.saving ? "Saving…" : "Save changes"}</button>${dirty ? `<button type="button" class="linkbtn" data-sc-discard>Discard</button>` : `<span class="note">All changes saved</span>`}<span class="err" id="scErr" role="alert"></span></div>` : ""}</div>`;
+  }
+  function schedFlash(m) { SCHED.flash = m; renderMain(); setTimeout(() => { if (SCHED.flash === m) { SCHED.flash = ""; if (state.current === "__sched") renderMain(); } }, 3500); }
+  document.addEventListener("click", async e => {
+    if (state.current !== "__sched") return;
+    const t = e.target;
+    if (t.closest('[data-sc="refresh"]')) { SCHED.data = null; schedLoad(true); renderMain(); return; }
+    const cp = t.closest("[data-sc-copy]"); if (cp) { try { await navigator.clipboard.writeText(cp.dataset.scCopy); schedFlash("Link copied."); } catch (x) { prompt("Copy this link:", cp.dataset.scCopy); } return; }
+    const tb = t.closest("[data-sc-tab]"); if (tb) { SCHED.tab = tb.dataset.scTab; renderMain(); return; }
+    if (t.closest("[data-sc-past]")) { SCHED.past = !SCHED.past; renderMain(); return; }
+    if (t.closest("[data-sc-addtype]")) { schedDraft().types.push({ slug: "", name: "New meeting", minutes: 30, zoom: "phil", active: false, description: "", question: "" }); renderMain(); return; }
+    const dt = t.closest("[data-sc-deltype]"); if (dt) { const ty = schedDraft().types[+dt.dataset.scDeltype]; if (confirm(`Remove "${ty.name}"? Its link stops working once you save.`)) { schedDraft().types.splice(+dt.dataset.scDeltype, 1); renderMain(); } return; }
+    if (t.closest("[data-sc-discard]")) { SCHED.draft = null; renderMain(); return; }
+    const so = t.closest("[data-sh-on]"); if (so) { const s = schedDraft().settings; s.hours[so.dataset.shOn] = so.checked ? [["09:00", "17:00"]] : []; renderMain(); return; }
+    if (t.closest("[data-sc-save]")) {
+      SCHED.saving = true; renderMain();
+      try { const dr = schedDraft(); SCHED.data = await gs("bkAdminSave", dr.settings, dr.types); SCHED.draft = null; SCHED.saving = false; schedFlash("Saved. The booking pages use the new settings now."); }
+      catch (x) { SCHED.saving = false; renderMain(); const el = $("#scErr"); if (el) el.textContent = x.message; }
+      return;
+    }
+    const cn = t.closest("[data-sc-cancel]"); if (cn) {
+      const b = SCHED.data.bookings.find(x => x.id === cn.dataset.scCancel);
+      const why = prompt(`Cancel ${b.name}'s meeting on ${schedWhen(b.start)}? They'll get a cancellation email. Add a note for them (optional):`, "");
+      if (why === null) return;
+      cn.disabled = true;
+      try { SCHED.data = await gs("bkAdminCancel", b.id, why); schedFlash("Cancelled and removed from your calendar."); } catch (x) { cn.disabled = false; alert(x.message); }
+    }
+  });
+  // Checkboxes are read in the capture phase: other click handlers may redraw the page before "input" fires.
+  document.addEventListener("click", e => { if (e.target.matches && e.target.matches('#main[data-page="__sched"] input[type=checkbox][data-tf]')) schedInput(e.target); }, true);
+  document.addEventListener("input", e => { if (!(e.target.type === "checkbox" && e.target.dataset.tf)) schedInput(e.target); });
+  function schedInput(t) {
+    if (state.current !== "__sched" || !SCHED.data) return;
+    const dr = schedDraft();
+    const ty = t.closest("[data-tf]"); if (ty) { const c = t.closest(".sc-type"), o = dr.types[+c.dataset.i], k = t.dataset.tf; o[k] = k === "active" ? t.checked : k === "minutes" ? Number(t.value) : t.value; }
+    else if (t.dataset.sf) { const s = dr.settings, k = t.dataset.sf; s[k] = k === "blackout" ? t.value.split(/[\s,]+/).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)) : t.type === "number" ? Number(t.value) : t.value; }
+    else if (t.dataset.sz) { dr.settings.zoom = { ...(dr.settings.zoom || {}), [t.dataset.sz]: t.value.trim() }; }
+    else if (t.dataset.sh) { const w = dr.settings.hours[t.dataset.sh]; if (w && w[0]) w[0][+t.dataset.shI] = t.value; }
+    else return;
+    const sv = document.querySelector("[data-sc-save]"); if (sv && !SCHED.saving) { sv.disabled = false; const n = sv.nextElementSibling; if (n && n.classList.contains("note")) n.outerHTML = `<button type="button" class="linkbtn" data-sc-discard>Discard</button>`; }
+  }
+  document.addEventListener("change", async e => {
+    const s = e.target.closest && e.target.closest("[data-sc-client]"); if (!s) return;
+    const b = SCHED.data.bookings.find(x => x.id === s.dataset.scClient); s.disabled = true;
+    try { await gs("bkAdminSetClient", b.id, s.value); b.client = s.value; } catch (x) { alert(x.message); s.value = b.client || ""; } finally { s.disabled = false; }
+  });
   /* ---------- Update with Claude: a chat that proposes changes, you approve, then it writes Pulse + the Sheet ---------- */
   const HUB_SHEET = "1BqKPiq-SBVObDvnQ_8tbtKc_QCN8MuIySgs9kaZjxl8";
   const GSHEETS = "Google Sheets";
@@ -3544,7 +3671,7 @@ Rules:
     d = Object.assign({}, d, { clients: (d.clients || []).map(c => { const x = Object.assign({}, c); if (x.logoId && logoCache[x.logoId]) x.logo = logoCache[x.logoId]; return x; }) });
     setTimeout(fetchLogos_, 0);
     state.clients = d.clients; state.items = d.items; state.invoices = d.invoices || []; state.overrides = d.overrides || []; state.searches = d.searches || []; state.canEdit = d.canEdit;
-    if (state.current !== "__billing" && state.current !== "__home" && state.current !== "__talent" && state.current !== "__reports" && state.current !== "__calendar" && state.current !== "__pipeline" && state.current !== "__intel" && state.current !== "__mkt" && !state.clients.find(c => c.id === state.current)) state.current = state.clients[0]?.id || null;
+    if (state.current !== "__billing" && state.current !== "__home" && state.current !== "__talent" && state.current !== "__reports" && state.current !== "__calendar" && state.current !== "__sched" && state.current !== "__pipeline" && state.current !== "__intel" && state.current !== "__mkt" && !state.clients.find(c => c.id === state.current)) state.current = state.clients[0]?.id || null;
     render();
   }
 
@@ -3658,7 +3785,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "a0c42c662c";
+  var BUILD = "879a971626";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schedule a meeting · Victoria Gillespie Consulting Group</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{--bg:#f3f7f8;--surface:#fff;--ink:#2b2730;--muted:#67626e;--line:#dbe5e8;--accent:#0077a6;--accent-soft:#e0f4f8;--teal:#05b1da;--err:#b3261e}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Source Sans 3",system-ui,sans-serif}
+h1,h2,h3{font-family:Jost,system-ui,sans-serif;font-weight:500;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.brand img{width:40px;height:38px}
+.brand span{font-family:Jost,sans-serif;font-weight:500;font-size:15px;letter-spacing:.02em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.03);overflow:hidden}
+.grid{display:grid;grid-template-columns:280px 1fr}
+.info{padding:26px;border-right:1px solid var(--line)}
+.info .eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.info h1{font-size:26px;line-height:1.2;margin-bottom:14px}
+.meta{list-style:none;padding:0;margin:0 0 16px;color:var(--muted);font-size:15px}
+.meta li{display:flex;gap:8px;align-items:center;margin:6px 0}
+.meta svg{flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.info p{color:var(--muted);margin:0;font-size:15px}
+.chosen{margin-top:18px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-weight:600;font-size:15px}
+.pane{padding:26px;min-height:420px}
+.pane h2{font-size:19px;margin-bottom:16px}
+.pick{display:grid;grid-template-columns:1fr 200px;gap:24px}
+.mhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mhead b{font-family:Jost,sans-serif;font-weight:500;font-size:16px}
+.nav{display:flex;gap:6px}
+.icon{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:34px;height:34px;cursor:pointer;display:grid;place-items:center}
+.icon:disabled{opacity:.35;cursor:default}
+.icon:not(:disabled):hover{border-color:var(--accent);color:var(--accent)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal .dow{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:4px 0}
+.cal button{aspect-ratio:1;border:0;border-radius:999px;background:transparent;cursor:default;font-size:15px;color:#b5b0ba;max-width:46px;width:100%;margin:0 auto}
+.cal button.on{background:var(--accent-soft);color:var(--accent);font-weight:600;cursor:pointer}
+.cal button.on:hover{background:#c9ecf4}
+.cal button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.cal button.today{box-shadow:inset 0 0 0 1px var(--line)}
+.tzrow{margin-top:18px;font-size:14px;color:var(--muted)}
+.tzrow label{display:block;margin-bottom:4px}
+.tzrow select{width:100%;max-width:340px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.times h3{font-size:15px;margin-bottom:10px;font-family:"Source Sans 3",sans-serif;font-weight:600}
+.tlist{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow:auto;padding-right:4px}
+.tlist button{border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:8px;padding:10px;font-weight:600;cursor:pointer}
+.tlist button:hover{background:var(--accent);color:#fff}
+.hint{color:var(--muted);font-size:14px}
+.types{display:grid;gap:12px}
+.type{display:block;text-align:left;width:100%;border:1px solid var(--line);border-left:4px solid var(--teal);background:var(--surface);border-radius:12px;padding:16px 18px;cursor:pointer}
+.type:hover{border-color:var(--accent)}
+.type b{font-family:Jost,sans-serif;font-weight:500;font-size:18px;display:block}
+.type span{color:var(--muted);font-size:14px}
+form.f{display:grid;gap:14px;max-width:460px}
+form.f label{display:grid;gap:5px;font-size:14px;font-weight:600}
+form.f input,form.f textarea{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-weight:400;background:var(--surface)}
+form.f textarea{min-height:96px;resize:vertical}
+form.f input:focus,form.f textarea:focus,.tzrow select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.go{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:600;cursor:pointer;justify-self:start}
+.go:disabled{opacity:.6;cursor:default}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;cursor:pointer}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.danger{color:var(--err)}
+.back{background:none;border:0;color:var(--accent);cursor:pointer;padding:0;margin-bottom:14px;font-weight:600}
+.err{color:var(--err);font-size:14px;min-height:1em}
+.done{max-width:520px}
+.done .tick{width:48px;height:48px;border-radius:999px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin-bottom:14px}
+.done h2{font-size:24px;margin-bottom:6px}
+.done .when{font-size:18px;font-weight:600;margin:14px 0 4px}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.row a{text-decoration:none}
+.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
+.loading{color:var(--muted);padding:40px 0;text-align:center}
+@media (max-width:820px){.grid{grid-template-columns:1fr}.info{border-right:0;border-bottom:1px solid var(--line)}.pick{grid-template-columns:1fr}.tlist{max-height:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><img src="/vgcg-mark.png" alt=""><span>Victoria Gillespie Consulting Group</span></div>
+  <main class="card" id="app" aria-live="polite"><div class="loading">Loading…</div></main>
+  <p class="foot">Times are shown in your time zone. Questions? Reply to your confirmation email.</p>
+</div>
+<script>
+(() => {
+  const API = "https://script.google.com/macros/s/AKfycbwX7DVWeyj8A00pKqZJHMZSAUGt0at8B268LG4XGc2HwfmZyyi4bMXMBQ8NE5TW-icd/exec";
+  const $ = s => document.querySelector(s);
+  const app = $("#app");
+  const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  async function call(fn, ...args) {
+    let r;
+    try { r = await fetch(API, { method: "POST", body: JSON.stringify({ fn, args }) }); }
+    catch (e) { throw new Error("Couldn't reach the scheduler. Check your connection and try again."); }
+    let j; try { j = await r.json(); } catch (e) { throw new Error("Something went wrong. Please try again."); }
+    if (!j.ok) throw new Error(j.error || "Something went wrong.");
+    return j.result;
+  }
+
+  /* ---------- time zones ---------- */
+  const guessTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York"; } catch (e) { return "America/New_York"; } })();
+  const COMMON = ["America/New_York", "America/Chicago", "America/Denver", "America/Phoenix", "America/Los_Angeles", "America/Anchorage", "Pacific/Honolulu", "America/Puerto_Rico", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Australia/Sydney"];
+  const ALL = (() => { try { return Intl.supportedValuesOf("timeZone"); } catch (e) { return COMMON; } })();
+  const S = { tz: guessTz, slug: null, type: null, types: [], org: "", month: null, slots: {}, day: null, time: null, token: null, booking: null };
+  try { const t = localStorage.getItem("vgcg.book.tz"); if (t && ALL.includes(t)) S.tz = t; } catch (e) {}
+  const fmtParts = (ms, tz, o) => new Intl.DateTimeFormat("en-US", { timeZone: tz, ...o }).format(new Date(ms));
+  const ymdIn = (ms, tz) => { const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(ms)).map(x => [x.type, x.value])); return `${p.year}-${p.month}-${p.day}`; };
+  const tzShort = (tz, ms = Date.now()) => { try { return new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "short" }).formatToParts(new Date(ms)).find(p => p.type === "timeZoneName").value; } catch (e) { return tz; } };
+  const tzLabel = tz => `${tz.replace(/_/g, " ").replace(/\//g, " / ")} (${tzShort(tz)})`;
+  const timeTxt = ms => fmtParts(ms, S.tz, { hour: "numeric", minute: "2-digit" });
+  const longWhen = ms => `${fmtParts(ms, S.tz, { weekday: "long", month: "long", day: "numeric", year: "numeric" })} at ${timeTxt(ms)} ${tzShort(S.tz, ms)}`;
+  const addDays = (ymd, n) => { const [y, m, d] = ymd.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
+
+  const ICON = {
+    clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    video: '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>',
+    globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>',
+    left: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>',
+    right: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>',
+    check: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>'
+  };
+
+  /* ---------- routing ---------- */
+  const params = new URLSearchParams(location.search);
+  const pathSlug = (location.pathname.match(/\/book\/([a-z0-9-]+)\/?$/) || [])[1];
+  async function start() {
+    try {
+      const t = await call("bkPubTypes");
+      S.types = t.types; S.org = t.org;
+      if (params.get("b")) return manage(params.get("b"));
+      const slug = pathSlug || params.get("t");
+      const type = slug && S.types.find(x => x.slug === slug);
+      if (type) return pickType(type);
+      if (S.types.length === 1) return pickType(S.types[0]);
+      viewTypes(slug && !type);
+    } catch (e) { fail(e.message); }
+  }
+  function fail(msg) { app.innerHTML = `<div class="pane"><h2>We couldn't load the scheduler</h2><p class="hint">${esc(msg)}</p><button class="ghost" type="button" onclick="location.reload()">Try again</button></div>`; }
+
+  function viewTypes(missing) {
+    document.title = "Schedule a meeting · Victoria Gillespie Consulting Group";
+    app.innerHTML = `<div class="pane"><h2>Schedule a meeting</h2>${missing ? `<p class="hint">That link has changed. Pick a meeting below.</p>` : ""}<div class="types">${S.types.map(t => `<button class="type" type="button" data-type="${esc(t.slug)}"><b>${esc(t.name)}</b><span>${t.minutes} minutes · Zoom${t.description ? ` · ${esc(t.description)}` : ""}</span></button>`).join("")}</div></div>`;
+  }
+
+  function pickType(type) {
+    S.type = type; S.slug = type.slug; S.day = null; S.time = null; S.slots = {};
+    document.title = `${type.name} · Victoria Gillespie Consulting Group`;
+    const now = new Date(); S.month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    renderPick(); loadMonth(true);
+  }
+
+  /* ---------- slot loading ---------- */
+  const monthDays = ym => { const [y, m] = ym.split("-").map(Number); return new Date(Date.UTC(y, m, 0)).getUTCDate(); };
+  const shiftMonth = (ym, n) => { const [y, m] = ym.split("-").map(Number); const d = new Date(Date.UTC(y, m - 1 + n, 1)); return d.toISOString().slice(0, 7); };
+  const thisMonth = () => ymdIn(Date.now(), S.tz).slice(0, 7);
+  async function loadMonth(autoAdvance, tries = 0) {
+    const ym = S.month, key = S.slug + "|" + ym;
+    if (!S.slots[key]) {
+      S.slots[key] = "loading"; renderPick();
+      try {
+        const r = await call("bkPubSlots", S.slug, addDays(ym + "-01", -1), addDays(`${ym}-${monthDays(ym)}`, 1), S.token || "");
+        S.slots[key] = r.slots.map(s => Date.parse(s));
+      } catch (e) { S.slots[key] = null; if (S.month === ym) { renderPick(e.message); } return; }
+    }
+    if (S.month !== ym) return;
+    const has = byDay().size > 0;
+    if (!has && autoAdvance && tries < 2) { S.month = shiftMonth(ym, 1); return loadMonth(true, tries + 1); }
+    if (autoAdvance && has && !S.day) S.day = [...byDay().keys()].sort()[0];
+    renderPick();
+  }
+  function byDay() {
+    const list = S.slots[S.slug + "|" + S.month], out = new Map();
+    if (!Array.isArray(list)) return out;
+    list.forEach(ms => { const d = ymdIn(ms, S.tz); if (d.slice(0, 7) !== S.month) return; if (!out.has(d)) out.set(d, []); out.get(d).push(ms); });
+    return out;
+  }
+
+  /* ---------- pick view ---------- */
+  function infoHtml(extra = "") {
+    const t = S.type;
+    return `<aside class="info"><div class="eyebrow">Book a time</div><h1>${esc(t.name)}</h1>
+      <ul class="meta"><li>${ICON.clock}${t.minutes} minutes</li><li>${ICON.video}Zoom video call</li><li>${ICON.globe}${esc(tzShort(S.tz))} time</li></ul>
+      ${t.description ? `<p>${esc(t.description)}</p>` : ""}${extra}</aside>`;
+  }
+  function renderPick(errMsg) {
+    const days = byDay(), key = S.slug + "|" + S.month, loading = S.slots[key] === "loading";
+    const [y, m] = S.month.split("-").map(Number);
+    const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay(), n = monthDays(S.month), today = ymdIn(Date.now(), S.tz);
+    let cells = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => `<div class="dow">${d}</div>`).join("");
+    for (let i = 0; i < first; i++) cells += "<div></div>";
+    for (let d = 1; d <= n; d++) {
+      const ymd = `${S.month}-${String(d).padStart(2, "0")}`, on = days.has(ymd);
+      const lbl = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" });
+      cells += `<button type="button" class="${on ? "on" : ""}${ymd === today ? " today" : ""}" ${on ? `data-day="${ymd}"` : "disabled"} aria-pressed="${S.day === ymd}" aria-label="${lbl}${on ? ", times available" : ""}">${d}</button>`;
+    }
+    const monthName = new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", { timeZone: "UTC", month: "long", year: "numeric" });
+    const times = S.day && days.get(S.day) || [];
+    const dayLbl = S.day ? new Date(S.day + "T12:00:00Z").toLocaleDateString("en-US", { timeZone: "UTC", weekday: "long", month: "long", day: "numeric" }) : "";
+    const reschedNote = S.booking ? `<div class="chosen">Moving your ${esc(S.booking.type)} from ${esc(longWhen(Date.parse(S.booking.start)))}</div>` : "";
+    app.innerHTML = `<div class="grid">${infoHtml(reschedNote)}<section class="pane">
+      ${S.booking ? `<button class="back" type="button" data-manage>← Back to your booking</button>` : S.types.length > 1 ? `<button class="back" type="button" data-alltypes>← All meeting types</button>` : ""}
+      <h2>Select a date and time</h2>
+      <div class="pick"><div>
+        <div class="mhead"><b>${monthName}</b><div class="nav"><button class="icon" type="button" data-mon="-1" aria-label="Previous month" ${S.month <= thisMonth() ? "disabled" : ""}>${ICON.left}</button><button class="icon" type="button" data-mon="1" aria-label="Next month">${ICON.right}</button></div></div>
+        <div class="cal">${cells}</div>
+        ${loading ? `<p class="hint">Checking availability…</p>` : errMsg ? `<p class="err">${esc(errMsg)}</p>` : !days.size ? `<p class="hint">No open times this month. Try the next month.</p>` : ""}
+        <div class="tzrow"><label for="tz">Time zone</label><select id="tz">${tzOptions()}</select></div>
+      </div>
+      <div class="times">${S.day ? `<h3>${esc(dayLbl)}</h3><div class="tlist">${times.map(ms => `<button type="button" data-time="${ms}">${esc(timeTxt(ms))}</button>`).join("")}</div>` : `<p class="hint">${days.size ? "Pick a highlighted date to see times." : ""}</p>`}</div>
+      </div></section></div>`;
+  }
+  function tzOptions() {
+    const list = [...new Set([S.tz, guessTz, ...COMMON])];
+    const rest = ALL.filter(z => !list.includes(z));
+    return `<optgroup label="Common">${list.map(z => `<option value="${esc(z)}"${z === S.tz ? " selected" : ""}>${esc(tzLabel(z))}</option>`).join("")}</optgroup><optgroup label="All time zones">${rest.map(z => `<option value="${esc(z)}">${esc(z.replace(/_/g, " "))}</option>`).join("")}</optgroup>`;
+  }
+
+  /* ---------- form ---------- */
+  function renderForm(errMsg) {
+    const t = S.type;
+    app.innerHTML = `<div class="grid">${infoHtml(`<div class="chosen">${esc(longWhen(S.time))}</div>`)}<section class="pane">
+      <button class="back" type="button" data-backpick>← Change time</button>
+      <h2>Your details</h2>
+      <form class="f" id="bf" novalidate>
+        <label>Name<input name="name" autocomplete="name" required maxlength="120"></label>
+        <label>Email<input name="email" type="email" autocomplete="email" required maxlength="160"></label>
+        <label>Organization<input name="org" autocomplete="organization" maxlength="160"></label>
+        <label>${esc(t.question || "Anything we should know?")}<textarea name="notes" maxlength="2000"></textarea></label>
+        <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <p class="err" id="ferr">${esc(errMsg || "")}</p>
+        <button class="go" type="submit">Schedule meeting</button>
+      </form></section></div>`;
+    $("#bf [name=name]").focus();
+  }
+
+  async function submitForm(f) {
+    const d = Object.fromEntries(new FormData(f).entries());
+    const err = $("#ferr"); err.textContent = "";
+    if (!d.name.trim()) { err.textContent = "Please enter your name."; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim())) { err.textContent = "Please enter a valid email address."; return; }
+    const b = f.querySelector(".go"); b.disabled = true; b.textContent = "Scheduling…";
+    try {
+      const r = await call("bkPubBook", { ...d, slug: S.slug, start: new Date(S.time).toISOString(), tz: S.tz });
+      renderDone(r, d.email.trim());
+    } catch (e) {
+      b.disabled = false; b.textContent = "Schedule meeting"; err.textContent = e.message;
+      if (/taken/i.test(e.message)) { delete S.slots[S.slug + "|" + S.month]; }
+    }
+  }
+
+  /* ---------- confirmation ---------- */
+  const gcalStamp = iso => iso.replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  function icsFile(title, startIso, endIso, details, loc) {
+    const e = s => String(s || "").replace(/[\\,;]/g, m => "\\" + m).replace(/\n/g, "\\n");
+    const body = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//VGCG//Scheduling//EN", "BEGIN:VEVENT", `UID:${gcalStamp(startIso)}-${Math.random().toString(36).slice(2)}@vgcg`, `DTSTAMP:${gcalStamp(new Date().toISOString())}`, `DTSTART:${gcalStamp(startIso)}`, `DTEND:${gcalStamp(endIso)}`, `SUMMARY:${e(title)}`, `DESCRIPTION:${e(details)}`, `LOCATION:${e(loc)}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    return URL.createObjectURL(new Blob([body], { type: "text/calendar" }));
+  }
+  function renderDone(r, email, moved) {
+    const title = `${r.type} with ${S.org || "VGCG"}`, details = r.zoom ? `Join Zoom: ${r.zoom}` : "";
+    const g = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${gcalStamp(r.start)}/${gcalStamp(r.end)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(r.zoom || "")}`;
+    app.innerHTML = `<section class="pane done"><div class="tick">${ICON.check}</div>
+      <h2>${moved ? "Your meeting has moved" : "You're scheduled"}</h2>
+      <p class="hint">${moved ? "We've updated the calendar and sent you an email with the new time." : `A confirmation and calendar invitation are on their way${email ? ` to ${esc(email)}` : ""}.`}</p>
+      <div class="when">${esc(longWhen(Date.parse(r.start)))}</div>
+      <div class="hint">${esc(r.type)} · ${r.minutes} minutes · Zoom</div>
+      <div class="row">${r.zoom ? `<a class="go" href="${esc(r.zoom)}" target="_blank" rel="noopener">Zoom link</a>` : ""}
+        <a class="ghost" href="${g}" target="_blank" rel="noopener">Add to Google Calendar</a>
+        <a class="ghost" href="${icsFile(title, r.start, r.end, details, r.zoom)}" download="vgcg-meeting.ics">Outlook / Apple (.ics)</a></div>
+      ${r.token ? `<p class="hint" style="margin-top:22px">Need to change it? <a href="?b=${esc(r.token)}">Reschedule or cancel</a>. The link is also in your email.</p>` : ""}
+    </section>`;
+  }
+
+  /* ---------- manage existing booking ---------- */
+  async function manage(token) {
+    S.token = token;
+    try { S.booking = await call("bkPubGet", token); } catch (e) { S.token = null; S.booking = null; return fail(e.message); }
+    renderManage();
+  }
+  function renderManage(errMsg) {
+    const b = S.booking, t = S.types.find(x => x.slug === b.slug);
+    S.type = t || { name: b.type, minutes: b.minutes, slug: b.slug }; S.slug = b.slug;
+    const cancelled = b.status !== "confirmed";
+    app.innerHTML = `<div class="grid">${infoHtml()}<section class="pane done">
+      <h2>${cancelled ? "This meeting is cancelled" : b.past ? "This meeting has passed" : "Your meeting"}</h2>
+      <div class="when">${esc(longWhen(Date.parse(b.start)))}</div>
+      <div class="hint">${esc(b.type)} · ${b.minutes} minutes${b.name ? ` · booked by ${esc(b.name)}` : ""}</div>
+      ${!cancelled && !b.past ? `<div class="row">${b.zoom ? `<a class="go" href="${esc(b.zoom)}" target="_blank" rel="noopener">Zoom link</a>` : ""}${t ? `<button class="ghost" type="button" data-resched>Reschedule</button>` : ""}<button class="ghost danger" type="button" data-cancel>Cancel meeting</button></div>
+        <div id="cbox" hidden style="margin-top:20px"><form class="f" id="cf"><label>Reason (optional)<textarea name="reason" maxlength="500" placeholder="Let us know why, if you'd like."></textarea></label><p class="err" id="cerr">${esc(errMsg || "")}</p><div class="row" style="margin-top:0"><button class="go" type="submit" style="background:var(--err)">Cancel this meeting</button><button class="ghost" type="button" data-keep>Keep it</button></div></form></div>`
+        : t ? `<div class="row"><a class="go" href="/book/${esc(b.slug)}">Book a new time</a></div>` : ""}
+      <div class="tzrow"><label for="tz">Time zone</label><select id="tz">${tzOptions()}</select></div>
+    </section></div>`;
+  }
+
+  /* ---------- events ---------- */
+  app.addEventListener("click", async e => {
+    const ty = e.target.closest("[data-type]"); if (ty) { pickType(S.types.find(x => x.slug === ty.dataset.type)); history.replaceState(null, "", `?t=${ty.dataset.type}`); return; }
+    if (e.target.closest("[data-alltypes]")) { history.replaceState(null, "", location.pathname.replace(/\/book\/[a-z0-9-]+\/?$/, "/book")); viewTypes(); return; }
+    const mo = e.target.closest("[data-mon]"); if (mo && !mo.disabled) { S.month = shiftMonth(S.month, +mo.dataset.mon); S.day = null; loadMonth(false); renderPick(); return; }
+    const dy = e.target.closest("[data-day]"); if (dy) { S.day = dy.dataset.day; renderPick(); const tl = $(".times"); if (tl && innerWidth <= 820) tl.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    const tm = e.target.closest("[data-time]"); if (tm) {
+      S.time = +tm.dataset.time;
+      if (S.booking) {
+        tm.disabled = true; tm.textContent = "Moving…";
+        try { S.booking = await call("bkPubReschedule", S.token, new Date(S.time).toISOString()); renderDone({ ...S.booking, type: S.booking.type }, "", true); }
+        catch (err) { S.slots = {}; renderPick(err.message); loadMonth(false); }
+        return;
+      }
+      renderForm(); return;
+    }
+    if (e.target.closest("[data-backpick]")) { renderPick(); return; }
+    if (e.target.closest("[data-manage]")) { S.slots = {}; renderManage(); return; }
+    if (e.target.closest("[data-resched]")) { S.day = null; const now = new Date(); S.month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`; S.slots = {}; renderPick(); loadMonth(true); return; }
+    if (e.target.closest("[data-cancel]")) { $("#cbox").hidden = false; $("#cf textarea").focus(); return; }
+    if (e.target.closest("[data-keep]")) { $("#cbox").hidden = true; return; }
+  });
+  app.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (e.target.id === "bf") return submitForm(e.target);
+    if (e.target.id === "cf") {
+      const b = e.target.querySelector(".go"); b.disabled = true;
+      try { S.booking = await call("bkPubCancel", S.token, e.target.reason.value); renderManage(); }
+      catch (err) { b.disabled = false; $("#cerr").textContent = err.message; }
+    }
+  });
+  app.addEventListener("change", e => {
+    if (e.target.id !== "tz") return;
+    S.tz = e.target.value; try { localStorage.setItem("vgcg.book.tz", S.tz); } catch (x) {}
+    if ($(".cal")) { S.day = null; loadMonth(false); renderPick(); } else if (S.booking) renderManage();
+  });
+
+  start();
+})();
+</script>
+</body>
+</html>
