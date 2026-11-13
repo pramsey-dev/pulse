@@ -409,7 +409,7 @@ function bkMail_(cfg, kind, b) {
     '</div></div>';
   var subj = { confirmed: 'Confirmed: ', rescheduled: 'Updated: ', cancelled: 'Cancelled: ' }[kind] + b.type.name + ' on ' +
     Utilities.formatDate(new Date(b.startMs), gtz, 'MMM d') ;
-  var host = s.notifyEmail || Session.getEffectiveUser().getEmail();
+  var host = s.notifyEmail || CalendarApp.getDefaultCalendar().getId();
   try {
     MailApp.sendEmail({ to: b.email, subject: subj, htmlBody: html, name: s.orgName, replyTo: host,
       body: head + '\n' + b.type.name + '\n' + when + (b.zoom && kind !== 'cancelled' ? '\nZoom: ' + b.zoom : '') + '\n' + (b.manage || '') });
