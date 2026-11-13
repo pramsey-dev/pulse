@@ -211,10 +211,19 @@ a.qb:hover{text-decoration-color:currentColor}
 .prow.tot .pn{font-weight:600}
 .prow.muted .pn{color:var(--muted);font-weight:500}
 .sc-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.cal-modes{display:inline-flex;gap:0;margin:6px 0 10px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.cal-modes .btn{border:0;border-radius:0;border-right:1px solid var(--line);display:inline-flex;align-items:center;gap:6px}
+.cal-modes .btn:last-child{border-right:0}
+.cal-modes .btn[aria-pressed="true"]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.cal-modes .cb{font-size:11px;min-width:18px;padding:0 5px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.sc-tag{font:600 10.5px/1.6 inherit;letter-spacing:.04em;text-transform:uppercase;border:0;border-radius:999px;padding:0 7px;background:var(--accent-soft);color:var(--accent);cursor:pointer;vertical-align:middle}
+.cal-ev .sc-tag{position:absolute;right:3px;bottom:3px}
+.cal-ev.short .sc-tag{font-size:0;width:9px;height:9px;padding:0;top:6px;bottom:auto;background:var(--accent)}
+.tbl tr.sc-hi td{background:var(--accent-soft)}
 .sc-types{display:grid;gap:12px}
 .sc-type{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px;display:grid;gap:10px;background:var(--surface)}
-.sc-type label,.sc-rules label,.sc-tz,#main[data-page="__sched"] section>label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
-.sc-type input,.sc-type select,.sc-rules input,.sc-tz select,.sc-day input,#main[data-page="__sched"] section>label input,.sc-client{font:inherit;font-size:14px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--bg)}
+.sc-type label,.sc-rules label,.sc-tz,.sc-page section>label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.sc-type input,.sc-type select,.sc-rules input,.sc-tz select,.sc-day input,.sc-page section>label input,.sc-client{font:inherit;font-size:14px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--bg)}
 .sc-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
 .sc-row label{min-width:110px}.sc-grow{flex:1 1 220px}
 .sc-type .sc-check,.sc-day .sc-check{display:flex;flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:14px}
@@ -224,7 +233,7 @@ a.qb:hover{text-decoration-color:currentColor}
 .sc-day .note{grid-column:2/5}
 .sc-tz{max-width:280px}
 .sc-rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
-.sc-rules .note,#main[data-page="__sched"] section>label .note{font-size:12px}
+.sc-rules .note,.sc-page section>label .note{font-size:12px}
 .sc-save{position:sticky;bottom:0;z-index:2;margin-top:10px;display:flex;gap:14px;align-items:center;padding:12px 0;background:var(--bg);border-top:1px solid var(--line)}
 .sc-save .err{color:#b3261e;font-size:13px}
 .sc-st{font-size:12px;color:#b3261e;text-transform:capitalize}
@@ -1099,13 +1108,13 @@ button.cal-du.late{cursor:pointer}
     const otherC = state.clients.filter(c => !isActive(c) && !isProsp(c)).sort((a,b) => billedTot(b.id) - billedTot(a.id) || nm(a).localeCompare(nm(b)));
     const sorted = [...prospC, ...activeC, ...otherC];
     const grpLabel = t => `<li class="rail-group" aria-hidden="true">${t}</li>`;
-    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" title="${a} in progress">${a}</span><span class="cb done${d ? "" : " zero"}" title="${d} completed">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__sched" aria-current="${state.current==="__sched"}"><span>Scheduling</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__mkt" aria-current="${state.current==="__mkt"}"><span>Marketing</span></button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
+    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" title="${a} in progress">${a}</span><span class="cb done${d ? "" : " zero"}" title="${d} completed">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__mkt" aria-current="${state.current==="__mkt"}"><span>Marketing</span></button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
     const matchQ = c => !q || (c.name+" "+(c.short||"")).toLowerCase().includes(q);
     const rowHtml = c => `<li><button type="button" data-id="${esc(c.id)}" aria-current="${c.id===state.current}"><span class="${/past|referral/i.test(c.stage||"")?"past":""}">${healthDot(c)}${esc(c.short||c.name)}</span><span class="cnts"><span class="cb prog${prog[c.id] ? "" : " zero"}" title="${prog[c.id]||0} in progress">${prog[c.id]||0}</span><span class="cb done${counts[c.id] ? "" : " zero"}" title="${counts[c.id]||0} completed">${counts[c.id]||0}</span></span></button></li>`;
     const pL = prospC.filter(matchQ), aL = activeC.filter(matchQ), oL = otherC.filter(matchQ);
     $("#navList").innerHTML = ov; list.innerHTML = (pL.length ? grpLabel("Prospective") + pL.map(rowHtml).join("") : "") + (aL.length ? grpLabel(`Active in ${cyr}`) + aL.map(rowHtml).join("") : "") + (oL.length ? grpLabel("All other clients") + oL.map(rowHtml).join("") : "");
-    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__sched"${state.current==="__sched"?" selected":""}>Scheduling</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__mkt"${state.current==="__mkt"?" selected":""}>Marketing</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
-    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __sched: "Scheduling", __pipeline: "Pipeline", __intel: "Intelligence", __mkt: "Marketing", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
+    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__mkt"${state.current==="__mkt"?" selected":""}>Marketing</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
+    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __pipeline: "Pipeline", __intel: "Intelligence", __mkt: "Marketing", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
     $("#clientViewBtn").setAttribute("aria-checked", String(state.clientView));
   }
 
@@ -1122,7 +1131,7 @@ button.cal-du.late{cursor:pointer}
   function renderMain() {
     { const mm = document.getElementById("main"); if (mm) { mm.dataset.page = state.current || ""; mm.dataset.kind = state.clients.some(c => c.id === state.current) ? "client" : ""; } }
     const main = $("#main");
-    if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__sched" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__sched") renderSched(); else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
+    if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__sched" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__sched") { state.current = "__calendar"; CAL.mode = "bookings"; renderRail(); renderCalendar(); } else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
     const c = state.clients.find(x => x.id === state.current);
     if (!c) {
       main.innerHTML = state.clients.length
@@ -1842,7 +1851,7 @@ button.cal-du.late{cursor:pointer}
   setTimeout(() => { try { if (store.get("pulse.token")) call("whoami").then(r => { if (r && r.email) store.set("pulse.whoami", String(r.email).toLowerCase()); }).catch(() => {}); } catch (e) {} }, 1500);
   const calWhere = "Adds to Phil's VGCG Google Calendar.";
   /* ---------- Calendar (Phil's VGCG Google Calendar) ---------- */
-  const CAL = { flash: "", h0: 8, events: [], loaded: false, loading: false, err: "", from: 0, to: 0, fetched: "", view: "", anchor: null, timer: 0 };
+  const CAL = { mode: "calendar", flash: "", h0: 8, events: [], loaded: false, loading: false, err: "", from: 0, to: 0, fetched: "", view: "", anchor: null, timer: 0 };
   const calDay = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
   const calAdd = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const calWeekStart = d => calAdd(calDay(d), -calDay(d).getDay());
@@ -1897,7 +1906,7 @@ button.cal-du.late{cursor:pointer}
     const past = ev.e2.getTime() < Date.now();
     return `<div class="cal-row${ev.response === "declined" ? " declined" : ""}${past ? " past" : ""}${calLive(ev) ? " now" : ""}">
       <div class="cal-t">${calWhenText(ev)}</div>
-      <div class="cal-b"><div class="cal-ti">${ev.html ? `<a href="${esc(ev.html)}" target="_blank" rel="noopener">${esc(ev.title)}</a>` : esc(ev.title)} ${calChip(ev)}</div>
+      <div class="cal-b"><div class="cal-ti">${ev.html ? `<a href="${esc(ev.html)}" target="_blank" rel="noopener">${esc(ev.title)}</a>` : esc(ev.title)} ${calBookTag(ev)}${calChip(ev)}</div>
         <div class="cal-m">${[who, ev.location, ev.response === "declined" ? "Declined" : ev.response === "needsAction" ? "Not responded" : ""].filter(Boolean).map(esc).join(" · ")}</div></div>
       <div class="cal-a">${calEditable(ev) ? `<button type="button" class="linkbtn cal-editb" data-cal-edit="${esc(ev.id)}">Edit</button>` : ""}${calJoin(ev)}</div></div>`;
   }
@@ -1930,7 +1939,7 @@ button.cal-du.late{cursor:pointer}
         const sh = e.s.getHours() + e.s.getMinutes() / 60, eh = Math.max(sh + 0.5, (calKey(e.e2) !== k ? 24 : e.e2.getHours() + e.e2.getMinutes() / 60));
         const hpx = Math.max(22, (eh - sh) * PX - 2), short = hpx < 40;
         return `<div class="cal-ev${short ? " short" : ""}${e.response === "declined" ? " declined" : ""}${e.client ? " has-client" : ""}${calLive(e) ? " now" : ""}" style="top:${top(sh)}px;height:${hpx}px;left:calc(${(e._lane / n) * 100}% + 2px);width:calc(${100 / n}% - 4px)" title="${esc(calTime(e.s) + " " + e.title)}">
-          ${calEditable(e) ? `<button type="button" class="cal-ev-t" data-cal-edit="${esc(e.id)}" title="Edit ${esc(e.title)}"><b>${esc(calTime(e.s))}</b> ${esc(e.title)}</button>` : `<a class="cal-ev-t" href="${esc(e.html || "#")}" target="_blank" rel="noopener"><b>${esc(calTime(e.s))}</b> ${esc(e.title)}</a>`}${short ? calJoin(e, true) : `<div class="cal-ev-f">${e.client ? `<span class="cal-ev-c">${esc(e.client.short || e.client.name)}</span>` : ""}${calJoin(e, true)}</div>`}</div>`;
+          ${calEditable(e) ? `<button type="button" class="cal-ev-t" data-cal-edit="${esc(e.id)}" title="Edit ${esc(e.title)}"><b>${esc(calTime(e.s))}</b> ${esc(e.title)}</button>${calBookTag(e)}` : `<a class="cal-ev-t" href="${esc(e.html || "#")}" target="_blank" rel="noopener"><b>${esc(calTime(e.s))}</b> ${esc(e.title)}</a>`}${short ? calJoin(e, true) : `<div class="cal-ev-f">${e.client ? `<span class="cal-ev-c">${esc(e.client.short || e.client.name)}</span>` : ""}${calJoin(e, true)}</div>`}</div>`;
       }).join("")}</div>`;
     };
     return `<div class="cal-week"><div class="cal-head"><div></div>${days.map(d => `<div class="${calKey(d) === todayK ? "today" : ""}"><span>${d.toLocaleDateString("en-US", { weekday: "short" })}</span> <b>${d.getDate()}</b></div>`).join("")}</div>
@@ -2479,6 +2488,9 @@ button.cal-du.late{cursor:pointer}
   })();
 
   function renderCalendar() {
+    if (state.clientView) CAL.mode = "calendar";
+    if (CAL.mode !== "calendar") return renderSched();
+    schedLoad(false);
     const main = $("#main");
     if (!CAL.anchor) CAL.anchor = new Date();
     if (!CAL.view) CAL.view = window.matchMedia("(max-width: 760px)").matches ? "agenda" : "week";
@@ -2489,8 +2501,8 @@ button.cal-du.late{cursor:pointer}
     const body = CAL.err ? `<div class="empty">${esc(CAL.err)}</div>` : !CAL.loaded ? `<div class="empty">Loading your calendar…</div>` : (CAL.view === "week" ? calWeekGrid(ws) : calAgenda(CAL.view === "agenda" ? ws : ws, 14));
     main.innerHTML = `<div class="top"><header class="head"><div style="min-width:0">
         <div class="cal-title"><h1>Calendar</h1>${CAL.fetched ? `<span class="cal-upd">Updated ${esc(calTime(new Date(CAL.fetched)))}</span>` : ""}</div>
-        <p class="lede">Every event on your VGCG Google Calendar. Join opens the meeting link in a new tab. Click an event you set up to edit or delete it; click an open time in the week to add one there.</p>
-      </div><div class="cal-acts"><button type="button" class="btn" data-cal="refresh">Refresh</button>${state.clientView ? "" : `<button type="button" class="btn primary" data-cal-new>+ New event</button>`}</div></header>
+        ${calModes()}<p class="lede">Every event on your VGCG Google Calendar. Join opens the meeting link in a new tab. Click an event you set up to edit or delete it; click an open time in the week to add one there.</p>
+      </div><div class="cal-acts"><button type="button" class="btn" data-cal="refresh">Refresh</button>${state.clientView || !SCHED.data ? "" : `<button type="button" class="btn" data-sc-copy="${esc(schedBase())}">Copy booking link</button>`}${state.clientView ? "" : `<button type="button" class="btn primary" data-cal-new>+ New event</button>`}</div></header>
       ${CAL.flash ? `<div class="banner cal-flash" role="status">${esc(CAL.flash)}</div>` : ""}
       ${CAL.loaded ? `<div class="stats cal-stats"><div class="stat"><div class="n">${weekEvents.length}</div><div class="l">meetings this week</div></div><div class="stat"><div class="n">${(weekEvents.reduce((s, e) => s + (e.e2 - e.s), 0) / 36e5).toFixed(1)}</div><div class="l">hours booked</div></div></div>` : ""}
       ${dueBoard()}
@@ -2885,15 +2897,28 @@ button.cal-du.late{cursor:pointer}
     call("bkAdminGet").then(d => { SCHED.data = d; SCHED.draft = null; }).catch(e => {
       const m = e.message || String(e);
       SCHED.err = /Unknown|not a function|not defined|bkAdmin/i.test(m) ? "Scheduling isn't switched on on the Pulse server yet. Add booking-server.gs to the server (steps are at the top of that file), then refresh." : m;
-    }).finally(() => { SCHED.loading = false; if (state.current === "__sched") renderMain(); });
+    }).finally(() => { SCHED.loading = false; if (state.current === "__calendar") renderMain(); });
   }
   const schedDraft = () => SCHED.draft || (SCHED.draft = JSON.parse(JSON.stringify({ settings: SCHED.data.settings, types: SCHED.data.types })));
   const schedBase = () => String((SCHED.data && SCHED.data.settings.publicUrl) || "").replace(/\/$/, "");
   const schedWhen = iso => { const d = new Date(iso); return isNaN(d) ? "—" : d.toLocaleString("en-US", { timeZone: (SCHED.data && SCHED.data.settings.tz) || "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }); };
+  function calModes() {
+    if (state.clientView) return "";
+    const n = SCHED.data ? SCHED.data.bookings.filter(b => b.status === "confirmed" && Date.parse(b.end) >= Date.now()).length : 0;
+    return `<div class="cal-modes" role="group" aria-label="Calendar views">${[["calendar", "Calendar"], ["bookings", "Bookings" + (n ? ` <span class="cb prog">${n}</span>` : "")], ["setup", "Booking setup"]].map(([k, l]) => `<button type="button" class="btn" data-cal-mode="${k}" aria-pressed="${CAL.mode === k}">${l}</button>`).join("")}</div>`;
+  }
+  // A calendar event that came from a booking: same start time and the guest is the booker.
+  function calBooking(ev) {
+    if (!SCHED.data || ev.allDay) return null;
+    const t = ev.s.getTime(), mails = (ev.attendees || []).map(a => String(a.e || "").toLowerCase());
+    return SCHED.data.bookings.find(b => b.status === "confirmed" && Date.parse(b.start) === t && mails.includes(String(b.email).toLowerCase())) || null;
+  }
+  const calBookTag = ev => { const b = calBooking(ev); return b ? `<button type="button" class="sc-tag" data-sc-show="${esc(b.id)}" title="Booked by ${esc(b.name)}${b.org ? ", " + esc(b.org) : ""}. Click for details.">Booked</button>` : ""; };
   function renderSched() {
     const main = $("#main"); schedLoad(false);
-    const head = `<div class="top"><header class="head"><div style="min-width:0"><h1>Scheduling</h1>
-        <p class="lede">VGCG's own booking pages. People pick an open time on your calendar; Pulse books it with a Zoom link and sends a VGCG-branded confirmation. Set meeting types and working hours here.</p></div>
+    const setup = CAL.mode === "setup"; if (setup && SCHED.tab === "bookings") SCHED.tab = "types"; if (!setup) SCHED.tab = "bookings";
+    const head = `<div class="top sc-page"><header class="head"><div style="min-width:0"><div class="cal-title"><h1>Calendar</h1></div>${calModes()}
+        <p class="lede">${setup ? "Meeting types and working hours for your VGCG booking pages. Open times are your hours minus anything already on your calendar." : "Meetings people booked through your VGCG booking pages. Each one is also on your calendar with its Zoom link."}</p></div>
         <div class="cal-acts"><button type="button" class="btn" data-sc="refresh">Refresh</button>${SCHED.data ? `<button type="button" class="btn primary" data-sc-copy="${esc(schedBase())}">Copy booking link</button>` : ""}</div></header>
         ${SCHED.flash ? `<div class="banner cal-flash" role="status">${esc(SCHED.flash)}</div>` : ""}`;
     if (!SCHED.data) { main.innerHTML = head + `<div class="empty">${esc(SCHED.err || "Loading scheduling…")}</div></div>`; return; }
@@ -2901,14 +2926,14 @@ button.cal-du.late{cursor:pointer}
     const up = d.bookings.filter(b => b.status === "confirmed" && Date.parse(b.end) >= now).sort((a, b) => a.start.localeCompare(b.start));
     const wk = up.filter(b => Date.parse(b.start) < now + 7 * 864e5).length;
     const last30 = d.bookings.filter(b => Date.parse(b.created) >= now - 30 * 864e5).length;
-    const tabs = [["bookings", "Bookings"], ["types", "Meeting types"], ["hours", "Availability"]].map(([k, l]) => `<button type="button" class="btn" data-sc-tab="${k}" aria-pressed="${SCHED.tab === k}">${l}</button>`).join("");
+    const tabs = !setup ? "" : [["types", "Meeting types"], ["hours", "Availability"]].map(([k, l]) => `<button type="button" class="btn" data-sc-tab="${k}" aria-pressed="${SCHED.tab === k}">${l}</button>`).join("");
     let body = "";
     if (SCHED.tab === "bookings") {
       const list = SCHED.past ? d.bookings.filter(b => !(b.status === "confirmed" && Date.parse(b.end) >= now)).sort((a, b) => b.start.localeCompare(a.start)) : up;
       const tname = s => (d.types.find(t => t.slug === s) || { name: s }).name;
       const clientSel = b => `<select class="sc-client" data-sc-client="${esc(b.id)}" aria-label="Client for ${esc(b.name)}"><option value="">No client</option>${state.clients.slice().sort((x, y) => (x.short || x.name).localeCompare(y.short || y.name)).map(c => `<option value="${esc(c.id)}"${c.id === b.client ? " selected" : ""}>${esc(c.short || c.name)}</option>`).join("")}</select>`;
       body = `<section class="section"><div class="section-head"><h2>${SCHED.past ? "Past and cancelled" : "Upcoming"}</h2><button type="button" class="linkbtn" data-sc-past>${SCHED.past ? "Show upcoming" : "Show past and cancelled"}</button></div>
-        ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>Meeting</th><th>Who</th><th>Client</th><th></th></tr></thead><tbody>${list.map(b => `<tr><td>${esc(schedWhen(b.start))}${b.visitorTz && b.visitorTz !== d.settings.tz ? `<div class="sub">their zone: ${esc(b.visitorTz.replace(/_/g, " "))}</div>` : ""}</td><td>${esc(tname(b.type))}${b.status !== "confirmed" ? ` <span class="sc-st">${esc(b.status)}</span>` : ""}</td><td><b>${esc(b.name)}</b>${b.org ? ` · ${esc(b.org)}` : ""}<div class="sub"><a href="mailto:${esc(b.email)}">${esc(b.email)}</a></div>${b.notes ? `<div class="sub sc-notes">${esc(b.notes)}</div>` : ""}</td><td>${clientSel(b)}</td><td>${b.status === "confirmed" && Date.parse(b.start) > now && state.canEdit ? `<button type="button" class="linkbtn" data-sc-cancel="${esc(b.id)}">Cancel</button>` : ""}</td></tr>`).join("")}</tbody></table></div>`
+        ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>Meeting</th><th>Who</th><th>Client</th><th></th></tr></thead><tbody>${list.map(b => `<tr id="bk-${esc(b.id)}"${SCHED.hi === b.id ? ' class="sc-hi"' : ""}><td>${esc(schedWhen(b.start))}${b.visitorTz && b.visitorTz !== d.settings.tz ? `<div class="sub">their zone: ${esc(b.visitorTz.replace(/_/g, " "))}</div>` : ""}</td><td>${esc(tname(b.type))}${b.status !== "confirmed" ? ` <span class="sc-st">${esc(b.status)}</span>` : ""}</td><td><b>${esc(b.name)}</b>${b.org ? ` · ${esc(b.org)}` : ""}<div class="sub"><a href="mailto:${esc(b.email)}">${esc(b.email)}</a></div>${b.notes ? `<div class="sub sc-notes">${esc(b.notes)}</div>` : ""}</td><td>${clientSel(b)}</td><td>${b.status === "confirmed" && Date.parse(b.start) > now && state.canEdit ? `<button type="button" class="linkbtn" data-sc-cancel="${esc(b.id)}">Cancel</button>` : ""}</td></tr>`).join("")}</tbody></table></div>`
           : `<div class="empty">${SCHED.past ? "No past bookings in the last four months." : "No upcoming bookings. Share your booking link to get some."}</div>`}</section>`;
     } else if (SCHED.tab === "types") {
       const dr = schedDraft();
@@ -2936,13 +2961,16 @@ button.cal-du.late{cursor:pointer}
     }
     const dirty = SCHED.draft && JSON.stringify({ settings: SCHED.data.settings, types: SCHED.data.types }) !== JSON.stringify(SCHED.draft);
     main.innerHTML = head + `<div class="stats"><div class="stat"><div class="n">${up.length}</div><div class="l">upcoming bookings</div></div><div class="stat"><div class="n">${wk}</div><div class="l">in the next 7 days</div></div><div class="stat"><div class="n">${last30}</div><div class="l">booked in the last 30 days</div></div><div class="stat"><div class="n">${d.types.filter(t => t.active).length}</div><div class="l">meeting types live</div></div></div>
-      <div class="filters sc-tabs">${tabs}</div>${body}
+      ${tabs ? `<div class="filters sc-tabs">${tabs}</div>` : ""}${body}
       ${SCHED.tab !== "bookings" && state.canEdit ? `<div class="sc-save"><button type="button" class="btn primary" data-sc-save${dirty && !SCHED.saving ? "" : " disabled"}>${SCHED.saving ? "Saving…" : "Save changes"}</button>${dirty ? `<button type="button" class="linkbtn" data-sc-discard>Discard</button>` : `<span class="note">All changes saved</span>`}<span class="err" id="scErr" role="alert"></span></div>` : ""}</div>`;
   }
-  function schedFlash(m) { SCHED.flash = m; renderMain(); setTimeout(() => { if (SCHED.flash === m) { SCHED.flash = ""; if (state.current === "__sched") renderMain(); } }, 3500); }
+  function schedFlash(m) { SCHED.flash = m; renderMain(); setTimeout(() => { if (SCHED.flash === m) { SCHED.flash = ""; if (state.current === "__calendar") renderMain(); } }, 3500); }
   document.addEventListener("click", async e => {
-    if (state.current !== "__sched") return;
     const t = e.target;
+    const md = t.closest("[data-cal-mode]"); if (md) { CAL.mode = md.dataset.calMode; SCHED.hi = ""; renderMain(); return; }
+    const bk = t.closest("[data-sc-show]"); if (bk) { e.preventDefault(); CAL.mode = "bookings"; SCHED.past = Date.parse((SCHED.data.bookings.find(x => x.id === bk.dataset.scShow) || {}).end || 0) < Date.now(); SCHED.hi = bk.dataset.scShow; renderMain(); const r = document.getElementById("bk-" + bk.dataset.scShow); if (r) r.scrollIntoView({ block: "center" }); return; }
+    const cp0 = t.closest("[data-sc-copy]"); if (cp0) { try { await navigator.clipboard.writeText(cp0.dataset.scCopy); if (CAL.mode === "calendar") { CAL.flash = "Booking link copied."; renderMain(); setTimeout(() => { if (CAL.flash === "Booking link copied.") { CAL.flash = ""; renderMain(); } }, 3000); } else schedFlash("Link copied."); } catch (x) { prompt("Copy this link:", cp0.dataset.scCopy); } return; }
+    if (state.current !== "__calendar" || CAL.mode === "calendar") return;
     if (t.closest('[data-sc="refresh"]')) { SCHED.data = null; schedLoad(true); renderMain(); return; }
     const cp = t.closest("[data-sc-copy]"); if (cp) { try { await navigator.clipboard.writeText(cp.dataset.scCopy); schedFlash("Link copied."); } catch (x) { prompt("Copy this link:", cp.dataset.scCopy); } return; }
     const tb = t.closest("[data-sc-tab]"); if (tb) { SCHED.tab = tb.dataset.scTab; renderMain(); return; }
@@ -2966,10 +2994,10 @@ button.cal-du.late{cursor:pointer}
     }
   });
   // Checkboxes are read in the capture phase: other click handlers may redraw the page before "input" fires.
-  document.addEventListener("click", e => { if (e.target.matches && e.target.matches('#main[data-page="__sched"] input[type=checkbox][data-tf]')) schedInput(e.target); }, true);
+  document.addEventListener("click", e => { if (e.target.matches && e.target.matches('.sc-page input[type=checkbox][data-tf]')) schedInput(e.target); }, true);
   document.addEventListener("input", e => { if (!(e.target.type === "checkbox" && e.target.dataset.tf)) schedInput(e.target); });
   function schedInput(t) {
-    if (state.current !== "__sched" || !SCHED.data) return;
+    if (state.current !== "__calendar" || CAL.mode === "calendar" || !SCHED.data) return;
     const dr = schedDraft();
     const ty = t.closest("[data-tf]"); if (ty) { const c = t.closest(".sc-type"), o = dr.types[+c.dataset.i], k = t.dataset.tf; o[k] = k === "active" ? t.checked : k === "minutes" ? Number(t.value) : t.value; }
     else if (t.dataset.sf) { const s = dr.settings, k = t.dataset.sf; s[k] = k === "blackout" ? t.value.split(/[\s,]+/).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)) : t.type === "number" ? Number(t.value) : t.value; }
@@ -3785,7 +3813,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "879a971626";
+  var BUILD = "b121948b14";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
