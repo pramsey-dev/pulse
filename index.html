@@ -280,36 +280,41 @@ a.qb:hover{text-decoration-color:currentColor}
 .hero .h,.lone .h{margin:0 0 8px}
 .lone .l{margin-top:4px}
 /* client pages: one scrolling page, sections placed on a grid, long lists in their own scroll boxes */
-#main[data-kind="client"]{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-content:start;align-items:start}
-#main[data-kind="client"]>.col-left{display:contents}
-#main[data-kind="client"]>.top{order:0;grid-column:1/-1}
-#main[data-kind="client"] .col-left>*{order:6}
-#main[data-kind="client"] .col-left>.cp-stats{order:1;grid-column:1/-1}
-#main[data-kind="client"] .col-left>.cp-projects{order:2;grid-column:1/-1}
-#main[data-kind="client"] .col-left>.in-sec{order:4}
-#main[data-kind="client"] .col-left>.cm{order:5}
-#main[data-kind="client"]>.col-right{order:3}
-#main[data-kind="client"] .col-left>.cp-contracts{order:7}
-#main[data-kind="client"] .col-left>.cp-fin{order:8}
-#main[data-kind="client"] .col-right .section-head{position:static;background:none;padding:0}
-#main[data-kind="client"] .pj-grid{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;overscroll-behavior-x:contain}
-#main[data-kind="client"] .pj-grid>.pj{flex:0 0 340px;scroll-snap-align:start}
-@media (max-width:560px){#main[data-kind="client"] .pj-grid>.pj{flex-basis:84vw}}
-#main[data-kind="client"] .timeline{max-height:75vh;overflow-y:auto;overscroll-behavior:contain;padding-right:6px}
-#main[data-kind="client"] .timeline .month-label{top:0;background:var(--bg);z-index:1}
-#main[data-kind="client"] .cm-list,#main[data-kind="client"] .in-list{max-height:60vh;overflow-y:auto;overscroll-behavior:contain}
-#main[data-kind="client"] .cp-projects>.plist{max-height:440px;overflow-y:auto;overscroll-behavior:contain}
-#main[data-kind="client"] .tbl-wrap{max-height:440px;overflow:auto;overscroll-behavior:contain}
-#main[data-kind="client"] .tbl thead th{position:sticky;top:0;z-index:1;background:var(--surface)}
-#main[data-kind="client"]>.col-right{min-width:0;padding:0;overflow:visible;height:auto}
+#main[data-pagekind="client"]{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-content:start;align-items:start}
+#main[data-pagekind="client"]>.col-left{display:contents}
+#main[data-pagekind="client"]>.top{order:0;grid-column:1/-1}
+#main[data-pagekind="client"] .col-left>*{order:6}
+#main[data-pagekind="client"] .col-left>.cp-stats{order:1;grid-column:1/-1}
+#main[data-pagekind="client"] .col-left>.cp-projects{order:2;grid-column:1/-1}
+#main[data-pagekind="client"] .col-left>.in-sec{order:4}
+#main[data-pagekind="client"] .col-left>.cm{order:5}
+#main[data-pagekind="client"] .col-left>.cp-side{order:4;display:flex;flex-direction:column;gap:26px;min-width:0}
+#main[data-pagekind="client"] .col-left>.cp-side:empty{display:none}
+#main[data-pagekind="client"]>.col-right{min-height:auto}
+#main[data-pagekind="client"]>.col-right{order:3}
+#main[data-pagekind="client"] .col-left>.cp-contracts{order:7}
+#main[data-pagekind="client"] .col-left>.cp-fin{order:8}
+#main[data-pagekind="client"] .col-right .section-head{position:static;background:none;padding:0}
+#main[data-pagekind="client"] .pj-grid{display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;overscroll-behavior-x:contain}
+#main[data-pagekind="client"] .pj-grid>.pj{flex:0 0 340px;scroll-snap-align:start}
+@media (max-width:560px){#main[data-pagekind="client"] .pj-grid>.pj{flex-basis:84vw}}
+#main[data-pagekind="client"] .timeline{max-height:75vh;overflow-y:auto;overscroll-behavior:contain;padding-right:6px}
+#main[data-pagekind="client"] .timeline .month-label{top:0;background:var(--bg);z-index:1}
+#main[data-pagekind="client"] .cm-list,#main[data-pagekind="client"] .in-list{max-height:60vh;overflow-y:auto;overscroll-behavior:contain}
+#main[data-pagekind="client"] .cp-projects>.plist{max-height:440px;overflow-y:auto;overscroll-behavior:contain}
+#main[data-pagekind="client"] .tbl-wrap{max-height:440px;overflow:auto;overscroll-behavior:contain}
+#main[data-pagekind="client"] .tbl thead th{position:sticky;top:0;z-index:1;background:var(--surface)}
+#main[data-pagekind="client"]>.col-right{min-width:0;padding:0;overflow:visible;height:auto}
 @media (min-width:1300px){
-  #main[data-kind="client"]{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:32px}
-  #main[data-kind="client"]>.col-right{grid-column:1;grid-row:span 2}
-  #main[data-kind="client"] .col-left>.in-sec,#main[data-kind="client"] .col-left>.cm{grid-column:2}
-  #main[data-kind="client"] .col-left>*{grid-column:1/-1}
-  #main[data-kind="client"] .col-left>.in-sec,#main[data-kind="client"] .col-left>.cm{grid-column:2}
+  #main[data-pagekind="client"]{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:32px}
+  #main[data-pagekind="client"]>.col-right{grid-column:1;grid-row:auto;min-height:auto}
+  #main[data-pagekind="client"] .col-left>.cp-side{grid-column:2}
+  #main[data-pagekind="client"]:not(:has(.cp-side>*))>.col-right{grid-column:1/-1}
+  #main[data-pagekind="client"] .col-left>.in-sec,#main[data-pagekind="client"] .col-left>.cm{grid-column:2}
+  #main[data-pagekind="client"] .col-left>*{grid-column:1/-1}
+  #main[data-pagekind="client"] .col-left>.in-sec,#main[data-pagekind="client"] .col-left>.cm{grid-column:2}
 }
-@media (min-width:1400px){#main[data-kind="client"]{overflow-y:auto;grid-template-rows:none;padding-bottom:28px}}
+@media (min-width:1400px){#main[data-pagekind="client"]{overflow-y:auto;grid-template-rows:none;padding-bottom:28px}}
 /* page scrollers: long lists scroll inside their own box so the page stays short */
 #main[data-page="__billing"] .tbl-wrap,#main[data-page="__mkt"] .tbl-wrap{max-height:520px;overflow:auto;overscroll-behavior:contain}
 #main[data-page="__billing"] .tbl thead th,#main[data-page="__mkt"] .tbl thead th{position:sticky;top:0;z-index:1;background:var(--surface)}
@@ -323,6 +328,22 @@ a.qb:hover{text-decoration-color:currentColor}
 .pj-grid:has(.mk-issue)>.mk-issue{flex:0 0 340px;scroll-snap-align:start}
 @media (max-width:560px){.pj-grid:has(.mk-issue)>.mk-issue{flex-basis:84vw}}
 .home-flow{display:flex;flex-direction:column;gap:28px;min-width:0}
+.att-stats{grid-template-columns:repeat(5,minmax(0,1fr))}
+.att-strip .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.att-jump{text-align:left;cursor:pointer;color:inherit;text-decoration:none;font:inherit;border:0;transition:background .15s}
+.att-jump:hover,.att-jump:focus-visible{background:var(--accent-soft)}
+.att-flow{display:flex;flex-direction:column;gap:26px;min-width:0}
+.att-sec{scroll-margin-top:16px}
+.att-row{cursor:pointer}
+.att-row .pn{min-width:0}
+.att-row .pc{display:block;font:500 14.5px/1.4 var(--f-body);min-width:0;overflow-wrap:anywhere}
+.att-row .pm{font:400 12.5px/1.45 var(--f-body);color:var(--muted);margin-top:3px;max-width:72ch}
+.att-row .pr{text-align:right;white-space:nowrap}
+.cnts .cb[data-cnt],.cnts .cb[data-tcnt]{cursor:pointer}
+.cnts .cb[data-cnt]:hover,.cnts .cb[data-tcnt]:hover{outline:1px solid currentColor;outline-offset:1px}
+.st-filters{margin-top:6px}
+@media (max-width:900px){.att-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.att-stats .stat:last-child:nth-child(odd){grid-column:1/-1}.att-strip .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.att-row .pr{white-space:normal}}
 .home-flow>.cal-strip{margin:0}
 .hcards.hscroll{display:flex;flex-wrap:nowrap;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:2px 2px 10px;scrollbar-width:thin;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .hcards.hscroll>.hcard{flex:0 0 264px;scroll-snap-align:start}
@@ -905,7 +926,8 @@ button.cal-du.late{cursor:pointer}
   html,body{height:100%}
   .app{height:100%;min-height:0;grid-template-columns:288px minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .rail{overflow:auto}
-  .main{max-width:none;height:100%;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:auto minmax(0,1fr);column-gap:40px;row-gap:22px;padding-block:28px 0;padding-left:40px;padding-right:max(32px,env(safe-area-inset-right,0px))}
+  .main{max-width:none;height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:28px;padding-block:28px 28px;padding-left:40px;padding-right:max(32px,env(safe-area-inset-right,0px))}
+  .main:has(>.col-left){overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:auto minmax(0,1fr);column-gap:40px;row-gap:22px;padding-bottom:0}
   .top{grid-column:1 / -1}
   .col-left,.col-right{min-height:0;overflow-y:auto;padding-bottom:28px;padding-right:6px}
   .col-right{gap:14px}
@@ -986,7 +1008,7 @@ button.cal-du.late{cursor:pointer}
     <div class="brand pulse"><span class="mark"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABcCAMAAACm/kDcAAAAkFBMVEUAAAAFsdoUxN729PRnZmdVTltZy&#43;Vx4fCc1ulrZW9fWGQA/f0LsP0xueUzx&#43;BKyuWfm6AUtrZWsfEAAP8AfP9LvOJWp6yJeooLa7VrGGt/f/9HveWY2OsXF2oAeX8wud9uapg6x97/AP9HzuSNiZD19a46S1x9eIGusuD//38A/39KPEc9OUYAfwAUj7V/AAB5z1PsAAAAMHRSTlMA&#43;vEICOleHSNfnwEFo6STGgMVAQJmAygDAwKTVwMCcBhzActGBP1GDQIC&#43;f0C/QJZj8UmAAAHtUlEQVR42qVah3LjOAylDZqURRVLstOcusm2q///dweQYhGL7OQ4s&#43;uMC8oD&#43;EACYmxtKXlHL5UQ3Xa73ZiFf/VCAn0wSPZ/lmy08H47C9/qP7Z2vQlS0sBXxd8MjIGzHP/bdr0QQpp/PX2w7cQBv/hQlME5L330gOKr3kg3oqrIVAD5hlp6RGnMe7HiGyA4VWeB6WbEUeYo5TiOsrLaEMB3UnHICEPjDwUPxlC8qLTs6vHUthu/2nZWizr6Ki&#43;&#43;3u12efOhd&#43;JJCMiXULZf3YlE3wnxWMEUy9&#43;j&#43;P1tJriMiYV4KTYrq9XfeayYWson8/eQhQfNN/ne0&#43;fC297TavtEh0ZoSsyv8edPSQwGJq359DOpxW/PiLe3BipxamMVkwzkA5p/qxWl8kVgftVi/ttgsmlqaE3GVpALVxCoJpSP5vMUINU4&#43;YJ2GYnXCdIMD2rBIM1AOkToh2RHOcOv0X/NMM&#43;RdR6eqt1uTmjE83hUWZrSRBK4gTZJkn&#43;L8rPwYB7M8juUKzebF3xpblaocDxqGF3SApOc8d3uIwcPpjPrrfwjQ3jQiwGu4EMRwkTyb/PftfHV9rfk8FVEKQcG3gmJ8g8X5U/4ixEBuJJ2h9CJP1F&#43;ln8k5r/JH3hC&#43;3&#43;5pLtiIbfIWf5fuxPLRg0UzPIR&#43;bYFNn6qdjSs0r/e/dig73dZN&#43;cAI/QvLWM3n6xOo9bw408T6YeMBXMAesZO7WHgn65/5MMPZnCCY5wdcKxsANiIvPLw&#43;QILT8gP/8wEmwTQASRR/pjBZ6W2OgKqd8ym0iky0WbQtkOATuxXpjitV1jG7pGfa3ayGiq2OM&#43;o3zNF4PuCyUzp5vvXVQ2c5MOz23Ht7wU3WgcEqx7lMTWfah/xL5TlH2gDc1V54hvDCMwOgHqsYgcMufMDIcCL8kHLR6FuS4OakggIpoCprG24anyBUgBqImh9zPNxlh6hOYUqpQq&#43;UxbtUUbJBfrsfi643gVl5RutmEJDbOI38v0709X1Z0kBfVT7/da6KDQRi0olc74bcuSs5IF20iUAbiTvwlxmwIY4&#43;e2rk7&#43;igJLg1n&#43;ivlsFbsNWNsRDYhufY7eqYO&#43;&#43;NAOyiQhDWAUyZpeDT82SAr3DwveBub1gIZlzCOtYyi6HSwooCyA6ObT&#43;HKO/YWmoyQHEc9oKRtg8sox0NqDbEExLBcAXtvHsRjtk/PrDbYXWeOBC0CTgBslBCiDN4oPfAW5N4IOgvIKIhIDTb58WWGcyKKM12Gujlul2AcTZF4BLW7rOZVAmLj5RDaXaw1BERIdF9tF23YcO4fpXv8cz9V8s2MIoaJfbLI5pLks5ywRAs0W12Gpbx3RLfonoP0HDADTljtBeAaFiqPQlUrCPkzIOJ53S89wxsYNNI/bsFLyFCiAT0rqOHcgD5PmfFBzzCsiB16U8SCrmvnSKvkJBkvQQJwzxCC8UuLyCMAY8yb/UpUO5gOYVLLOojtynyhZvw&#43;IZJgzyMZ&#43;mmV1bL9/h6FBJQ5imXkELQ56n81lVl08Y&#43;Y1GXKQCwGGlNNAX6tWrwpIq3LHUK4jwSFitnEHGgyXZ2UOLpWvCY5/WLbgSIIa4L&#43;k6LjiQ44DAp1cEaPWy4AuOQaWyaaRsGfxIEFjEeB2gtGTORd8Qk2WxiZd4jV8AiDXKhuBlBqWLaybZe1&#43;IMWXQ64XboD&#43;2yMXBy&#43;4Ekvex3EZ7e/ikAK0CRDkSH7ziIOB3&#43;KIYPPkYpymcVuRTdHS0h1&#43;MeZFeLFdrsO7Xu93gERrtvkhORlG3x1In3K&#43;QqLsuxcd3mPNo04Eq3vD4fEm4BBBrficXEH8HlMkBflmg&#43;aUtkL9Chdfwu&#43;QSOJcHm78XAGKDi8BLIClwAa&#43;xGQkGGM2y/ELPJXeNxZvOoz3eVY9VetE3hqdlItd0yl7EEaTOJpIQ6U3cCL5nK1dxK8e1EkB9y7fTSMNNJsbxcT5PEqdNxBJJO6dn8izjPjoVA84ubgHfuMNrftSR48/gOsrj&#43;WZScSOImfvOt1V83O0PC7wq9sQr9oIAwuKMSOXsEkCNJ7lNNfFyU7AHdsZTsYpOFLcXIjwE8mWupQgIkmsLdh1zm1rfbf7&#43;FXQL1tqaJkOzhHDjMkkw5Fc/DdAe1LufKw6oIL4bUWrpDsHoADr0044RUcHHbv0gFLSWBTuWYfQavuvmOOWC7ujsaniC8kQvaI6LtZa0DbRu/4otzT4aGpTUu1LD20z0gvb&#43;uN7yVgsNei5jBhQF&#43;eqmWcxA2oqp9XJ3dCh11DXZahV3BdvNiOXszT9/v9hSx/R3GiozJNKDRtWMi3IHD3rODDIcEiFNVtf0uK0GgknPZ1o7h31uzJrsMC0ac8nHSl2emSg7qNNOzHPAlpQEgzoUvhzUUUKIXl4IgRs1ds4JCEeNbWtmjcnc1IgX18kPh6WzCtmvD0tRvOxoqHzt8F0NbtyLKmgSCqKgozvRdpf9O82sPjUw0eP2jR2Ig55Ln5fYnE86wyqhjVCfez5BDX4mvjETfTtyHzGPRmkSCyQ9VEA&#43;Nuyziz/7hwbsYwPBcwOUSG/6wQS93RX7wqKdah578Eq0ou7dPV7R0SS4eWBfXOGDG1sPvlVk5sx3X35ww8x0NROB8I&#43;HIH1s3&#43;2jJ83l0P4HuNhR/4oFgqAAAAAASUVORK5CYII=" alt="VGCG"></span><span class="pulse-badge">Pulse</span></div>
     <button type="button" class="mobile-menu" id="mobileMenu" aria-expanded="false" aria-label="Open the menu"><span id="mobileMenuLabel">Menu</span><span class="chev" aria-hidden="true">&#9662;</span></button>
     <div class="rail-menu" id="railMenu"><ul class="clients nav" id="navList"></ul>
-    <div class="rail-head" id="railHead"><span>Clients</span><span class="cleg" aria-label="Work item status"><span><i class="cb prog"></i>In progress</span><span><i class="cb done"></i>Done</span></span></div>
+    <div class="rail-head" id="railHead"><span>Clients</span><span class="cleg" aria-label="Work item counts"><span><i class="cb prog"></i>Open</span><span><i class="cb flag"></i>Overdue</span></span></div>
     <input class="search" id="search" type="search" placeholder="Find a client" aria-label="Find a client">
     <select class="mobile-pick" id="mobilePick" aria-label="Choose a client"></select>
     <ul class="clients" id="clientList"></ul></div><div class="menu-scrim" id="menuScrim" aria-hidden="true"></div>
@@ -1096,7 +1118,7 @@ button.cal-du.late{cursor:pointer}
     const list = $("#clientList"), pick = $("#mobilePick");
     const q = state.q.toLowerCase();
     const counts = {}, prog = {};
-    state.items.forEach(i => { if (i.status === "done") counts[i.client] = (counts[i.client]||0) + 1; else if (i.status === "active") prog[i.client] = (prog[i.client]||0) + 1; });
+    const todayK = calKey(new Date()); state.items.forEach(i => { if (i.kind === "invoice" || i.kind === "contract" || !(i.status === "active" || i.status === "planned")) return; prog[i.client] = (prog[i.client]||0) + 1; if (/^\d{4}-\d{2}-\d{2}$/.test(dueKey(i)||"") && dueKey(i) < todayK && !attBlocked(i)) counts[i.client] = (counts[i.client]||0) + 1; });
     const cyr = String(new Date().getFullYear());
     const billedTot = id => state.invoices.filter(i => i.client === id).reduce((s,i)=>s+i.amount,0);
     const isProsp = c => /prospect|proposed/i.test(c.stage||"");
@@ -1108,13 +1130,13 @@ button.cal-du.late{cursor:pointer}
     const otherC = state.clients.filter(c => !isActive(c) && !isProsp(c)).sort((a,b) => billedTot(b.id) - billedTot(a.id) || nm(a).localeCompare(nm(b)));
     const sorted = [...prospC, ...activeC, ...otherC];
     const grpLabel = t => `<li class="rail-group" aria-hidden="true">${t}</li>`;
-    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" title="${a} in progress">${a}</span><span class="cb done${d ? "" : " zero"}" title="${d} completed">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__mkt" aria-current="${state.current==="__mkt"}"><span>Marketing</span></button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
+    const ov = state.clientView ? "" : `<li><button type="button" data-id="__home" aria-current="${state.current==="__home"}"><span>Home</span></button></li><li><button type="button" data-id="__todo" aria-current="${state.current==="__todo"}"><span>Needs attention</span>${(() => { const A = attData(), s = A.soon.length + A.blocked.length; return A.total ? `<span class="cnts">${s ? `<span class="cb prog" title="${A.soon.length} due this week, ${A.blocked.length} waiting on others">${s}</span>` : ""}${A.flag ? `<span class="cb flag" title="${A.flag} overdue or to follow up">${A.flag}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__billing" aria-current="${state.current==="__billing"}"><span>Financials</span></button></li><li><button type="button" data-id="__talent" aria-current="${state.current==="__talent"}"><span>Talent</span>${state.searches.length ? (() => { const a = state.searches.filter(s => s.status === "Active").length, d = state.searches.length - a; return `<span class="cnts"><span class="cb prog${a ? "" : " zero"}" data-tcnt="active" title="${a} active: select to see them">${a}</span><span class="cb done${d ? "" : " zero"}" data-tcnt="past" title="${d} completed: select to see them">${d}</span></span>`; })() : ""}</button></li><li><button type="button" data-id="__calendar" aria-current="${state.current==="__calendar"}"><span>Calendar</span></button></li><li><button type="button" data-id="__pipeline" aria-current="${state.current==="__pipeline"}"><span>Pipeline</span>${(() => { const o = pipeOpenList(), f = o.filter(p => p.nudge).length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} open">${o.length}</span>${f ? `<span class="cb flag" title="${f} need a follow-up">${f}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__intel" aria-current="${state.current==="__intel"}"><span>Intelligence</span>${(() => { const o = state.intel.filter(i => !i.status || i.status === "new"), r = o.filter(i => i.signal === "risk").length; return o.length ? `<span class="cnts"><span class="cb prog" title="${o.length} to review">${o.length}</span>${r ? `<span class="cb flag" title="${r} risk${r===1?"":"s"}">${r}</span>` : ""}</span>` : ""; })()}</button></li><li><button type="button" data-id="__mkt" aria-current="${state.current==="__mkt"}"><span>Marketing</span></button></li><li><button type="button" data-id="__reports" aria-current="${state.current==="__reports"}"><span>Reports</span></button></li><li class="rail-sep" aria-hidden="true"></li>`;
     const matchQ = c => !q || (c.name+" "+(c.short||"")).toLowerCase().includes(q);
-    const rowHtml = c => `<li><button type="button" data-id="${esc(c.id)}" aria-current="${c.id===state.current}"><span class="${/past|referral/i.test(c.stage||"")?"past":""}">${healthDot(c)}${esc(c.short||c.name)}</span><span class="cnts"><span class="cb prog${prog[c.id] ? "" : " zero"}" title="${prog[c.id]||0} in progress">${prog[c.id]||0}</span><span class="cb done${counts[c.id] ? "" : " zero"}" title="${counts[c.id]||0} completed">${counts[c.id]||0}</span></span></button></li>`;
+    const rowHtml = c => `<li><button type="button" data-id="${esc(c.id)}" aria-current="${c.id===state.current}"><span class="${/past|referral/i.test(c.stage||"")?"past":""}">${healthDot(c)}${esc(c.short||c.name)}</span>${prog[c.id] || counts[c.id] ? `<span class="cnts">${prog[c.id] ? `<span class="cb prog" data-cnt="open" title="${prog[c.id]} open item${prog[c.id]===1?"":"s"}: select to see them">${prog[c.id]}</span>` : ""}${counts[c.id] ? `<span class="cb flag" data-cnt="late" title="${counts[c.id]} overdue: select to see them">${counts[c.id]}</span>` : ""}</span>` : ""}</button></li>`;
     const pL = prospC.filter(matchQ), aL = activeC.filter(matchQ), oL = otherC.filter(matchQ);
     $("#navList").innerHTML = ov; list.innerHTML = (pL.length ? grpLabel("Prospective") + pL.map(rowHtml).join("") : "") + (aL.length ? grpLabel(`Active in ${cyr}`) + aL.map(rowHtml).join("") : "") + (oL.length ? grpLabel("All other clients") + oL.map(rowHtml).join("") : "");
-    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__mkt"${state.current==="__mkt"?" selected":""}>Marketing</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
-    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __pipeline: "Pipeline", __intel: "Intelligence", __mkt: "Marketing", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
+    pick.innerHTML = (state.clientView ? "" : `<option value="__home"${state.current==="__home"?" selected":""}>Home</option><option value="__todo"${state.current==="__todo"?" selected":""}>Needs attention</option><option value="__billing"${state.current==="__billing"?" selected":""}>Financials</option><option value="__talent"${state.current==="__talent"?" selected":""}>Talent</option><option value="__calendar"${state.current==="__calendar"?" selected":""}>Calendar</option><option value="__pipeline"${state.current==="__pipeline"?" selected":""}>Pipeline</option><option value="__intel"${state.current==="__intel"?" selected":""}>Intelligence</option><option value="__mkt"${state.current==="__mkt"?" selected":""}>Marketing</option><option value="__reports"${state.current==="__reports"?" selected":""}>Reports</option>`) + sorted.map(c => `<option value="${esc(c.id)}"${c.id===state.current?" selected":""}>${esc(c.name)}</option>`).join("");
+    { const cur = state.clients.find(x => x.id === state.current); const ml = document.getElementById("mobileMenuLabel"); if (ml) ml.textContent = ({ __home: "Home", __todo: "Needs attention", __billing: "Financials", __talent: "Talent", __calendar: "Calendar", __pipeline: "Pipeline", __intel: "Intelligence", __mkt: "Marketing", __reports: "Reports" })[state.current] || (cur ? (cur.short || cur.name) : "Menu"); }
     $("#clientViewBtn").setAttribute("aria-checked", String(state.clientView));
   }
 
@@ -1129,9 +1151,9 @@ button.cal-du.late{cursor:pointer}
   }
 
   function renderMain() {
-    { const mm = document.getElementById("main"); if (mm) { mm.dataset.page = state.current || ""; mm.dataset.kind = state.clients.some(c => c.id === state.current) ? "client" : ""; } }
+    { const mm = document.getElementById("main"); if (mm) { mm.dataset.page = state.current || ""; mm.dataset.pagekind = state.clients.some(c => c.id === state.current) ? "client" : ""; } }
     const main = $("#main");
-    if (state.current === "__home" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__sched" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__sched") { state.current = "__calendar"; CAL.mode = "bookings"; renderRail(); renderCalendar(); } else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
+    if (state.current === "__home" || state.current === "__todo" || state.current === "__billing" || state.current === "__talent" || state.current === "__reports" || state.current === "__calendar" || state.current === "__sched" || state.current === "__pipeline" || state.current === "__intel" || state.current === "__mkt") { if (state.clientView) { state.current = state.clients[0]?.id || null; } else { if (state.current === "__home") renderHome(); else if (state.current === "__todo") renderAttention(); else if (state.current === "__talent") renderTalent(); else if (state.current === "__reports") renderReports(); else if (state.current === "__calendar") renderCalendar(); else if (state.current === "__sched") { state.current = "__calendar"; CAL.mode = "bookings"; renderRail(); renderCalendar(); } else if (state.current === "__pipeline") renderPipeline(); else if (state.current === "__intel") renderIntel(); else if (state.current === "__mkt") renderMkt(); else renderOverview(); return; } }
     const c = state.clients.find(x => x.id === state.current);
     if (!c) {
       main.innerHTML = state.clients.length
@@ -1149,7 +1171,8 @@ button.cal-du.late{cursor:pointer}
     const first = items.map(i=>i.date).sort()[0] || c.since;
     const months = first ? Math.max(1, Math.round((Date.now() - new Date(first+"T12:00:00"))/2629800000)) : 0;
 
-    let shown = items.filter(i => (state.ws==="all" || i.ws===state.ws) && (state.kind==="all" || i.kind===state.kind));
+    const stK = state.st || "all", todayR = calKey(new Date()), isOpenI = i => i.status === "active" || i.status === "planned";
+    let shown = items.filter(i => (state.ws==="all" || i.ws===state.ws) && (state.kind==="all" || i.kind===state.kind) && (stK === "all" || (stK === "open" ? isOpenI(i) && i.kind !== "invoice" && i.kind !== "contract" : isOpenI(i) && i.kind !== "invoice" && i.kind !== "contract" && /^\d{4}-\d{2}-\d{2}$/.test(dueKey(i)||"") && dueKey(i) < todayR && !attBlocked(i))));
     shown.sort((a,b) => b.date.localeCompare(a.date) || (a.title||"").localeCompare(b.title||""));
     const byMonth = [];
     shown.forEach(i => { const k = i.date.slice(0,7); let g = byMonth[byMonth.length-1]; if (!g || g.k!==k) byMonth.push(g={k,rows:[]}); g.rows.push(i); });
@@ -1295,15 +1318,15 @@ button.cal-du.late{cursor:pointer}
         ${[...b.inv].sort((x,y)=>y.date.localeCompare(x.date) || String(y.num).localeCompare(String(x.num))).map(i => { const st = invStatus(i); return `<tr><td class="mono">${esc(i.date)}</td><td class="mono">${i.link ? `<a class="qb" href="${esc(i.link)}" target="_blank" rel="noopener" title="Open in QuickBooks">${esc(i.num)}</a>` : esc(i.num)}</td><td>${esc(i.desc)}</td><td>${esc(i.kind==="travel" ? "Travel" : ((c.workstreams||[]).find(w=>w.id===i.ws)?.name || "—"))}</td><td class="num">${money(i.amount)}</td><td class="num">${i.balance>0.005?money(i.balance):"—"}</td><td><span class="pill ${st[0]}">${esc(st[1])}</span></td></tr>`; }).join("")}
         </tbody></table></div>
       </section>` : ""}
-      ${intelSection(c)}
-      ${commsSection(c)}
+      <div class="cp-side">${intelSection(c)}${commsSection(c)}</div>
       </div>
 
       <section class="section col-right">
         <div class="section-head"><h2>Record of work</h2>
           <div class="filters" role="group" aria-label="Filter by type">
             ${["all",...Object.keys(KIND)].map(k => `<button type="button" data-kind="${k}" aria-pressed="${state.kind===k}">${k==="all"?"Everything":KIND[k]+"s"}</button>`).join("")}
-          </div></div>
+          </div>
+          <div class="filters st-filters" role="group" aria-label="Filter by status">${[["all","Any status"],["open","Open"],["late","Overdue"]].map(([k,l]) => `<button type="button" data-rst="${k}" aria-pressed="${stK===k}">${l}</button>`).join("")}</div></div>
         ${byMonth.length ? `<div class="timeline">${byMonth.map(g => `
           <div class="month"><div class="month-label">${esc(fmtMonth(g.k+"-01"))}</div>
             <div class="rows">${g.rows.map(i => `
@@ -1392,8 +1415,8 @@ button.cal-du.late{cursor:pointer}
           </button>`).join("")}
         </div>
       </section>
+      ${attStrip()}
       ${calStrip()}
-      ${healthBox()}
       <div class="home-act">${actBox()}</div>
       <section class="section">
         <div class="section-head"><h2>Upcoming payments</h2></div>
@@ -1973,7 +1996,7 @@ button.cal-du.late{cursor:pointer}
   const dueId = i => i._id || i.id;
   const dueClient = i => { const c = state.clients.find(x => x.id === i.client); return c ? (c.short || c.name) : i.client; };
   const dueWsName = i => { const c = state.clients.find(x => x.id === i.client); const w = c && (c.workstreams || []).find(z => z.id === i.ws); return w ? w.name : ""; };
-  const dueLate = i => dueKey(i) < dueToday();
+  const dueLate = i => dueKey(i) < dueToday() && !attBlocked(i);
   const dueDay = k => calDayLabel(calWhen(k));
   function dueByDay(from, to) {
     const a = calKey(from), b = calKey(to), out = {};
@@ -1994,11 +2017,12 @@ button.cal-du.late{cursor:pointer}
     const all = dueList();
     const t = dueToday(), wk = calKey(calAdd(new Date(), 7)), two = calKey(calAdd(new Date(), 21));
     const groups = [
-      ["late", "Overdue", all.filter(i => dueKey(i) < t)],
-      ["today", "Today", all.filter(i => dueKey(i) === t)],
-      ["week", "Next 7 days", all.filter(i => dueKey(i) > t && dueKey(i) <= wk)],
-      ["soon", "Following 2 weeks", all.filter(i => dueKey(i) > wk && dueKey(i) <= two)],
-      ["later", "Later", all.filter(i => dueKey(i) > two)]
+      ["late", "Overdue", all.filter(i => dueKey(i) < t && !attBlocked(i))],
+      ["wait", "Waiting on others", all.filter(i => attBlocked(i))],
+      ["today", "Today", all.filter(i => dueKey(i) === t && !attBlocked(i))],
+      ["week", "Next 7 days", all.filter(i => dueKey(i) > t && dueKey(i) <= wk && !attBlocked(i))],
+      ["soon", "Following 2 weeks", all.filter(i => dueKey(i) > wk && dueKey(i) <= two && !attBlocked(i))],
+      ["later", "Later", all.filter(i => dueKey(i) > two && !attBlocked(i))]
     ].filter(g => g[2].length);
     const counts = groups.map(g => `<span class="due-c ${g[0]}">${g[2].length} ${g[1].toLowerCase()}</span>`).join("");
     const body = !all.length ? `<div class="cal-empty">Nothing open with a due date. Planned and in-progress work items with a date show up here.</div>`
@@ -2010,7 +2034,7 @@ button.cal-du.late{cursor:pointer}
   /* a "Due" strip under the day headers in the week view */
   function dueWeekRow(days) {
     const t = dueToday(), by = dueByDay(days[0], calAdd(days[days.length - 1], 1));
-    const late = dueList().filter(i => dueKey(i) < t).length;
+    const late = dueList().filter(i => dueKey(i) < t && !attBlocked(i)).length;
     if (!Object.keys(by).length && !late) return "";
     return `<div class="cal-allday cal-due"><div class="cal-gut">Due</div>${days.map(d => { const k = calKey(d); return `<div>${k === t && late ? `<span class="cal-du late" title="Overdue items are listed in To do above">${late} overdue</span>` : ""}${(by[k] || []).map(i => `<button type="button" class="cal-du ${dueLate(i) ? "late" : i.status}" data-edit="${esc(dueId(i))}" title="${esc(dueClient(i) + ": " + i.title)}"><b>${esc(dueClient(i))}</b> ${esc(i.title)}</button>`).join("")}</div>`; }).join("")}</div>`;
   }
@@ -2018,6 +2042,7 @@ button.cal-du.late{cursor:pointer}
   const dueRow = i => `<div class="cal-row due-in-list${dueLate(i) ? " late" : ""}"><div class="cal-t"><span class="due-tag">Due</span></div><div class="cal-b"><div class="cal-ti">${esc(i.title)} <button type="button" class="cal-chip" data-go="${esc(i.client)}">${esc(dueClient(i))}</button></div><div class="cal-m">${esc([dueWsName(i), KIND[i.kind] || i.kind, STATUS[i.status] || i.status].filter(Boolean).join(" · "))}</div></div><div class="cal-a">${state.canEdit ? `<button type="button" class="linkbtn cal-editb" data-edit="${esc(dueId(i))}">Edit</button><button type="button" class="linkbtn" data-due-done="${esc(dueId(i))}">Mark done</button>` : ""}</div></div>`;
   /* one line on Home under Today's meetings */
   function dueStripLine() {
+    return ""; /* Home shows the Needs attention strip instead */
     const all = dueList(); if (!all.length) return "";
     const t = dueToday(), today = all.filter(i => dueKey(i) === t), late = all.filter(i => dueKey(i) < t), wk = all.filter(i => dueKey(i) > t && dueKey(i) <= calKey(calAdd(new Date(), 7)));
     const bits = [late.length ? `<b class="late">${late.length} overdue</b>` : "", today.length ? `<b>${today.length} due today</b>` : "", wk.length ? `${wk.length} due in the next 7 days` : ""].filter(Boolean);
@@ -2100,7 +2125,7 @@ button.cal-du.late{cursor:pointer}
     else if (since > 45) issues.push([2, `No contact in ${since} days`]);
     else if (since > 21) issues.push([1, `No contact in ${since} days`]);
     /* overdue work */
-    const late = its.filter(i => (i.status === "planned" || i.status === "active") && /^\d{4}-\d{2}-\d{2}$/.test(dueKey(i) || "") && dueKey(i) < today);
+    const late = its.filter(i => (i.status === "planned" || i.status === "active") && /^\d{4}-\d{2}-\d{2}$/.test(dueKey(i) || "") && dueKey(i) < today && !attBlocked(i));
     if (late.length) {
       const worst = Math.max(...late.map(i => Math.floor((calWhen(today) - calWhen(dueKey(i))) / day)));
       issues.push([worst > 14 ? 2 : 1, `${late.length} overdue item${late.length === 1 ? "" : "s"}${worst > 1 ? ` (up to ${worst} days)` : ""}`]);
@@ -2134,11 +2159,73 @@ button.cal-du.late{cursor:pointer}
     if (state.clientView) return "";
     const rows = state.clients.map(c => ({ c, h: clientHealth(c) })).filter(r => r.h && r.h.level > 0).sort((a, b) => b.h.level - a.h.level || a.c.name.localeCompare(b.c.name));
     const tracked = state.clients.filter(c => clientHealth(c)).length;
-    return `<section class="section health-box"><div class="section-head"><h2>Needs attention</h2><span class="note">${tracked} current client${tracked === 1 ? "" : "s"} checked: last contact, overdue work, late invoices, quiet searches</span></div>
+    return `<section class="section health-box"><div class="section-head"><h2>Client health</h2><span class="note">${tracked} current client${tracked === 1 ? "" : "s"} checked: last contact, overdue work, late invoices, quiet searches</span></div>
       ${rows.length ? `<div class="plist">${rows.map(({ c, h }) => `<div class="prow" data-go="${esc(c.id)}" tabindex="0" role="button">
           <div class="pn"><i class="hdot ${healthCls(h.level)}"></i>${esc(c.short || c.name)} <span class="pill ${h.level === 2 ? "late" : "planned"} hl-${healthCls(h.level)}">${esc(h.label)}</span></div>
           <div class="pc" style="font-family:var(--f-body);font-size:13.5px">${h.issues.map(esc).join(" · ")}</div></div>`).join("")}</div>`
         : `<div class="empty">Every current client looks healthy: recent contact, nothing overdue, no late invoices.</div>`}</section>`;
+  }
+
+  /* ---------- Needs attention: one page for everything that needs a move ---------- */
+  const ATT_BLOCK = /(waiting on|waiting for|awaiting|delayed on|on hold|client'?s side|their side)/i;
+  function attBlocked(i) {
+    const m = String(i.note || ""); if (!ATT_BLOCK.test(m)) return "";
+    if (/on hold/i.test(m)) return "On hold";
+    const w = m.match(/(?:[Ww]aiting on|[Ww]aiting for|[Aa]waiting) ([A-Z][\w.-]*)/);
+    return w && !/^(the|client|them)$/i.test(w[1]) ? "Waiting on " + w[1] : "Waiting on client";
+  }
+  function attData() {
+    const empty = { late: [], soon: [], blocked: [], props: [], invs: [], quiet: [], flag: 0, total: 0 };
+    if (state.clientView) return empty;
+    const day = 864e5, today = calKey(new Date()), wk = calKey(new Date(Date.now() + 7 * day));
+    const ago = d => Math.floor((calWhen(today) - calWhen(d)) / day);
+    const open = state.items.filter(i => (i.status === "planned" || i.status === "active") && !["invoice", "contract", "proposal"].includes(i.kind) && /^\d{4}-\d{2}-\d{2}$/.test(dueKey(i) || ""));
+    const blocked = open.filter(i => attBlocked(i)).sort((a, b) => dueKey(a).localeCompare(dueKey(b)));
+    const free = open.filter(i => !attBlocked(i));
+    const late = free.filter(i => dueKey(i) < today).sort((a, b) => dueKey(a).localeCompare(dueKey(b)));
+    const soon = free.filter(i => dueKey(i) >= today && dueKey(i) <= wk).sort((a, b) => dueKey(a).localeCompare(dueKey(b)));
+    const props = pipeOpenList().filter(p => p.nudge);
+    const invs = state.invoices.filter(i => /late/.test(invStatus(i).join(" "))).map(i => ({ i, d: Math.floor((Date.now() - new Date((i.due || i.date) + "T12:00:00")) / day) })).sort((a, b) => b.d - a.d);
+    const quiet = state.clients.map(c => ({ c, h: clientHealth(c) })).filter(r => r.h && r.h.level > 0);
+    return { late, soon, blocked, props, invs, quiet, ago, today, flag: late.length + props.length + invs.length, total: late.length + soon.length + blocked.length + props.length + invs.length + quiet.length };
+  }
+  function attRow(i, right, tone) {
+    const c = state.clients.find(x => x.id === i.client);
+    const can = state.canEdit && !state.clientView;
+    return `<div class="prow att-row"${can ? ` data-edit="${esc(i._id)}" title="Edit this item"` : ""} tabindex="0" role="button">
+      <div class="pn"><button type="button" class="cal-chip" data-go="${esc(i.client)}">${esc(c ? (c.short || c.name) : i.client)}</button></div>
+      <div class="pc">${esc(i.title || "Untitled")}${i.note ? `<div class="pm">${esc(i.note)}</div>` : ""}</div>
+      <div class="pr"><span class="pill ${tone}">${esc(right)}</span></div></div>`;
+  }
+  function attSec(id, title, note, body, n) {
+    return `<section class="section att-sec" id="att-${id}"><div class="section-head"><h2>${title}</h2><span class="note">${n} · ${note}</span></div>${n ? `<div class="plist">${body}</div>` : `<div class="empty">Nothing here right now.</div>`}</section>`;
+  }
+  function renderAttention() {
+    const main = $("#main"), A = attData();
+    const cN = c => c.short || c.name;
+    const dd = d => d === 0 ? "due today" : d === 1 ? "1 day late" : d + " days late";
+    const tiles = [["late", A.late.length, "overdue on our side", "warn"], ["soon", A.soon.length, "due in the next 7 days", ""], ["blocked", A.blocked.length, "waiting on others", ""], ["follow", A.props.length + A.invs.length, "to follow up", A.props.length + A.invs.length ? "warn" : ""], ["health", A.quiet.length, "clients to watch", ""]];
+    main.innerHTML = `<div class="top"><header class="head"><div style="min-width:0"><h1>Needs attention</h1>
+      <p class="lede">Everything that needs a move, across every client: late work, this week's deadlines, items waiting on clients, proposals and invoices to chase, and clients who have gone quiet. Select an item to edit it, or a client name to open the client.</p></div></header>
+      <div class="stats att-stats">${tiles.map(([k, n, l, w]) => `<button type="button" class="stat att-jump" data-attjump="${k}"><div class="n ${n && w ? w : ""}">${n}</div><div class="l">${l}</div></button>`).join("")}</div></div>
+      <div class="att-flow">
+      ${attSec("late", "Overdue", "oldest first", A.late.map(i => attRow(i, dd(A.ago(dueKey(i))), "late")).join(""), A.late.length)}
+      ${attSec("soon", "Due this week", "soonest first", A.soon.map(i => attRow(i, dueKey(i) === A.today ? "Due today" : "Due " + fmtDay(dueKey(i)), "active")).join(""), A.soon.length)}
+      ${attSec("blocked", "Waiting on others", "client-side delays and holds; no action from us until they move", A.blocked.map(i => attRow(i, attBlocked(i), "planned")).join(""), A.blocked.length)}
+      ${attSec("follow", "Follow up", "proposals with no touch in 10+ days and invoices past due",
+        A.props.map(p => `<div class="prow att-row" data-go="__pipeline" tabindex="0" role="button"><div class="pn"><button type="button" class="cal-chip" data-go="${esc(p.c.id)}">${esc(cN(p.c))}</button></div><div class="pc">Proposal: ${esc(p.w.name)}<div class="pm">${p.sent ? "Sent " + esc(fmtDay(p.sent)) : esc(PIPE_LABEL[p.stage] || p.stage)}${p.touch && p.touch !== p.sent ? " · last touch " + esc(fmtDay(p.touch)) : ""} · open Pipeline to log a follow-up</div></div><div class="pr"><span class="pill late">${p.quiet} days quiet</span></div></div>`).join("")
+        + A.invs.map(({ i, d }) => { const c = state.clients.find(x => x.id === i.client); return `<div class="prow att-row" data-go="${esc(i.client)}" tabindex="0" role="button"><div class="pn"><button type="button" class="cal-chip" data-go="${esc(i.client)}">${esc(c ? cN(c) : i.client)}</button></div><div class="pc">Invoice ${esc(i.num)}${i.link ? ` · <a class="qb" href="${esc(i.link)}" target="_blank" rel="noopener">open in QuickBooks</a>` : ""}<div class="pm">${esc(i.desc || "")} · ${money(i.balance)} open</div></div><div class="pr"><span class="pill late">${d} days past due</span></div></div>`; }).join(""),
+        A.props.length + A.invs.length)}
+      <div class="att-sec" id="att-health">${healthBox()}</div>
+      </div>`;
+  }
+  /* the Home teaser: counts that open the Needs attention page */
+  function attStrip() {
+    if (state.clientView) return "";
+    const A = attData();
+    const t = [["late", A.late.length, "overdue"], ["soon", A.soon.length, "due this week"], ["blocked", A.blocked.length, "waiting on others"], ["follow", A.props.length + A.invs.length, "to follow up"]];
+    return `<section class="section att-strip"><div class="section-head"><h2>Needs attention</h2><span class="note">${A.total ? A.total + " item" + (A.total === 1 ? "" : "s") : "All clear"} · <button type="button" class="linkbtn" data-go="__todo">open the full list</button></span></div>
+      <div class="stats">${t.map(([k, n, l]) => `<button type="button" class="stat att-jump" data-go="__todo" data-att="${k}"><div class="n ${n && (k === "late" || k === "follow") ? "warn" : ""}">${n}</div><div class="l">${l}</div></button>`).join("")}</div></section>`;
   }
   /* ---------- Proposal pipeline: engagements that are still being proposed, by stage ---------- */
   /* the server saves the proposal, writes the Sheet and logs the activity */
@@ -3699,7 +3786,7 @@ Rules:
     d = Object.assign({}, d, { clients: (d.clients || []).map(c => { const x = Object.assign({}, c); if (x.logoId && logoCache[x.logoId]) x.logo = logoCache[x.logoId]; return x; }) });
     setTimeout(fetchLogos_, 0);
     state.clients = d.clients; state.items = d.items; state.invoices = d.invoices || []; state.overrides = d.overrides || []; state.searches = d.searches || []; state.canEdit = d.canEdit;
-    if (state.current !== "__billing" && state.current !== "__home" && state.current !== "__talent" && state.current !== "__reports" && state.current !== "__calendar" && state.current !== "__sched" && state.current !== "__pipeline" && state.current !== "__intel" && state.current !== "__mkt" && !state.clients.find(c => c.id === state.current)) state.current = state.clients[0]?.id || null;
+    if (state.current !== "__billing" && state.current !== "__home" && state.current !== "__todo" && state.current !== "__talent" && state.current !== "__reports" && state.current !== "__calendar" && state.current !== "__sched" && state.current !== "__pipeline" && state.current !== "__intel" && state.current !== "__mkt" && !state.clients.find(c => c.id === state.current)) state.current = state.clients[0]?.id || null;
     render();
   }
 
@@ -3758,10 +3845,14 @@ Rules:
     if (e.target.closest(".pj-items")) { const pe = e.target.closest(".pj-items li[data-edit]"); if (pe) openItem(state.items.find(i => i._id === pe.dataset.edit)); return; }
     const mm = e.target.closest("#mobileMenu"); if (mm) { const open = document.querySelector(".rail").classList.toggle("menu-open"); mm.setAttribute("aria-expanded", String(open)); const rm = document.getElementById("railMenu"); if (open && rm) rm.style.top = (mm.offsetTop + mm.offsetHeight + 6) + "px"; return; }
     if (e.target.closest("#menuScrim")) { document.querySelector(".rail").classList.remove("menu-open"); const mb0 = document.getElementById("mobileMenu"); if (mb0) mb0.setAttribute("aria-expanded", "false"); return; }
+    const cnt = e.target.closest("[data-cnt]"); if (cnt) { const b2 = cnt.closest("button[data-id]"); if (b2) { document.querySelector(".rail").classList.remove("menu-open"); state.current = b2.dataset.id; state.ws = "all"; state.kind = "all"; state.st = cnt.dataset.cnt; try{localStorage.setItem("hub.client", state.current)}catch{}; render(); setTimeout(() => { const r = document.querySelector("#main .col-right"); if (r) r.scrollIntoView({ block: "start", behavior: "smooth" }); }, 40); return; } }
+    const tcn = e.target.closest("[data-tcnt]"); if (tcn) { document.querySelector(".rail").classList.remove("menu-open"); state.current = "__talent"; state.tf = tcn.dataset.tcnt; render(); return; }
+    const aj = e.target.closest("[data-attjump]"); if (aj) { const s = document.getElementById("att-" + aj.dataset.attjump); if (s) s.scrollIntoView({ block: "start", behavior: "smooth" }); return; }
+    const sf = e.target.closest("[data-rst]"); if (sf) { state.st = sf.dataset.rst; renderMain(); return; }
     const cb = e.target.closest("#clientList button, #navList button");
     if (cb) { const rl = document.querySelector(".rail"); if (rl.classList.contains("menu-open")) { rl.classList.remove("menu-open"); const mb = document.getElementById("mobileMenu"); if (mb) mb.setAttribute("aria-expanded", "false"); setTimeout(() => window.scrollTo(0, 0), 0); } }
-    if (cb) { state.current = cb.dataset.id; state.ws = "all"; state.kind="all"; try{localStorage.setItem("hub.client", state.current)}catch{}; render(); return; }
-    const tr = e.target.closest("tr[data-id],[data-go]"); if (tr) { state.current = tr.dataset.id || tr.dataset.go; state.ws = "all"; state.kind = "all"; try{localStorage.setItem("hub.client", state.current)}catch{}; render(); return; }
+    if (cb) { state.current = cb.dataset.id; state.ws = "all"; state.kind="all"; state.st = "all"; if (cb.dataset.id === "__talent") state.tf = "all"; try{localStorage.setItem("hub.client", state.current)}catch{}; render(); return; }
+    const tr = e.target.closest("tr[data-id],[data-go]"); if (tr) { state.current = tr.dataset.id || tr.dataset.go; state.ws = "all"; state.kind = "all"; state.st = "all"; try{localStorage.setItem("hub.client", state.current)}catch{}; render(); const at = tr.dataset.att; if (at) setTimeout(() => { const s = document.getElementById("att-" + at); if (s) s.scrollIntoView({ block: "start" }); }, 40); return; }
     if (e.target.closest(".prow a")) return;
     const w = e.target.closest("[data-ws]"); if (w) { state.ws = w.dataset.ws; renderMain(); return; }
     const rcs = e.target.closest(".rp-custom > summary"); if (rcs) { const dd = rcs.parentElement; if (dd.id === "rpMail") state.rpMailOpen = !dd.open; else state.rpCustOpen = !dd.open; }
@@ -3813,7 +3904,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "b121948b14";
+  var BUILD = "b5e419fb22";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
