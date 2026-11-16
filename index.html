@@ -3266,14 +3266,14 @@ button.cal-du.late{cursor:pointer}
   }
   const chatDay = () => { const p = {}; new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", weekday: "long" }).formatToParts(new Date()).forEach(x => p[x.type] = x.value); return { iso: `${p.year}-${p.month}-${p.day}`, wd: p.weekday }; };
   function chatSync() {
-    if (!CH.inited && state.canEdit && !state.clientView) { CH.inited = true; initChat(); }
+    if (!CH.inited && state.canEdit && !state.clientView && !(CH.retryAt > Date.now())) { CH.inited = true; initChat(); }
     const b = $("#chatFab"); if (!b) return;
     const ok = !!CH.sample && state.canEdit && !state.clientView;
     b.hidden = !ok; if (!ok && CH.open) chatToggle(false);
   }
   async function initChat() {
     try { const st = await gs("chatStatus"); CH.sample = st && st.ready ? true : null; } catch (e) { CH.sample = null; }
-    if (!CH.sample) return;
+    if (!CH.sample) { CH.inited = false; CH.retryAt = Date.now() + 30000; setTimeout(() => { try { chatSync(); } catch (x) {} }, 31000); return; }
     const fab = document.createElement("button");
     fab.id = "chatFab"; fab.type = "button"; fab.className = "chat-fab"; fab.innerHTML = `<span aria-hidden="true">♥</span> Heartbeat`;
     fab.addEventListener("click", () => chatToggle(!CH.open));
@@ -3991,7 +3991,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "b4267502f1";
+  var BUILD = "bcd72de95c";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
