@@ -229,6 +229,31 @@ a.qb:hover{text-decoration-color:currentColor}
 .sc-type .sc-check,.sc-day .sc-check{display:flex;flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:14px}
 .sc-link{font-size:13px;color:var(--muted)}.sc-link .mono{font:12px var(--f-mono);overflow-wrap:anywhere}
 .sc-hours{display:grid;gap:8px}
+.inv-box{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 18px}
+.inv-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:start}
+.inv-form{display:flex;flex-direction:column;gap:12px;min-width:0}
+.inv-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.inv-form label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
+.inv-form label.sc-check{flex-direction:row;align-items:center;font-weight:500;color:var(--ink);font-size:14px}
+.inv-form input:not([type=checkbox]),.inv-form select,.inv-form textarea{font:inherit;font-size:14px;font-weight:400;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);min-width:0}
+.inv-form textarea{resize:vertical;line-height:1.45}
+.inv-acts{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.inv-err{color:var(--late);font-size:14px}
+.inv-ok{color:var(--done,#1f7a4d);font-size:14px;font-weight:600}
+.inv-prev-h{font:600 11px/1.3 var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
+.inv-mail{background:#fff;color:#2b2730;border:1px solid #dbe5e8;border-radius:12px;padding:16px 18px;font:14px/1.5 Helvetica,Arial,sans-serif}
+.inv-mail p{margin:0 0 10px}
+.inv-subj{font-weight:700;font-size:13px;color:#67626e;border-bottom:1px solid #dbe5e8;padding-bottom:8px;margin-bottom:12px}
+.inv-what{font-size:11.5px;color:#67626e;text-transform:uppercase;letter-spacing:.08em}
+.inv-btn{display:inline-block;background:#0077a6;color:#fff;padding:8px 16px;border-radius:8px;font-weight:600}
+.inv-small{font-size:12px;color:#67626e}
+.inv-sig{border-top:1px solid #dbe5e8;padding-top:10px;margin-top:12px}
+.inv-sig span{font-size:12px;color:#67626e}
+.inv-recent{margin-top:16px}
+.inv-r{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;padding:6px 0;border-top:1px solid var(--line);color:var(--muted)}
+.inv-r b{color:var(--ink)}
+@media (max-width:900px){.inv-grid{grid-template-columns:1fr}}
+@media (max-width:560px){.inv-row{grid-template-columns:1fr}}
 .sc-day{display:grid;grid-template-columns:150px minmax(0,1fr);justify-content:start;gap:10px;align-items:start;font-size:14px}
 .sc-day>.sc-check{padding-top:7px}
 .sc-day>.note{padding-top:7px}
@@ -3007,12 +3032,66 @@ button.cal-du.late{cursor:pointer}
     return SCHED.data.bookings.find(b => b.status === "confirmed" && Date.parse(b.start) === t && mails.includes(String(b.email).toLowerCase())) || null;
   }
   const calBookTag = ev => { const b = calBooking(ev); return b ? `<button type="button" class="sc-tag" data-sc-show="${esc(b.id)}" title="Booked by ${esc(b.name)}${b.org ? ", " + esc(b.org) : ""}. Click for details.">Booked</button>` : ""; };
+  /* Email a booking link: Pulse sends a VGCG email with a "Pick a time" button */
+  const INV = { open: false, busy: false, err: "", sent: "", d: null };
+  const invMe = () => String(store.get("pulse.whoami") || store.get("pulse.email") || "").toLowerCase();
+  const invDefault = () => `Thank you for your interest in Victoria Gillespie Consulting Group. I'd welcome the chance to talk.\n\nUse the button below to pick a time that works for you.`;
+  function invPanel() {
+    if (!INV.open || !SCHED.data) return "";
+    const types = SCHED.data.types.filter(t => t.active);
+    const d = INV.d || (INV.d = { email: "", name: "", type: types[0] ? types[0].slug : "", subject: "", note: invDefault(), ccMe: false });
+    const me = /^(vgillespie|victoria)$/.test(invMe().split("@")[0]) ? "Victoria Gillespie" : "Phil Ramsey";
+    const ty = types.find(t => t.slug === d.type);
+    const subj = d.subject || `${ty ? ty.name : "A conversation"} with ${SCHED.data.settings.orgName || "Victoria Gillespie Consulting Group"}`;
+    const recent = (SCHED.data.invites || []).slice(0, 6);
+    return `<section class="section inv-box"><div class="section-head"><h2>Email a booking link</h2><button type="button" class="linkbtn" data-inv-close>Close</button></div>
+      <div class="inv-grid">
+        <div class="inv-form">
+          <div class="inv-row"><label>Their email<input type="email" data-inv="email" value="${esc(d.email)}" placeholder="name@organization.org" autocomplete="off"></label><label>Their name<input data-inv="name" value="${esc(d.name)}" placeholder="First and last name"></label></div>
+          <div class="inv-row"><label>Meeting type<select data-inv="type"><option value=""${d.type ? "" : " selected"}>Let them choose</option>${types.map(t => `<option value="${esc(t.slug)}"${t.slug === d.type ? " selected" : ""}>${esc(t.name)} (${t.minutes} min)</option>`).join("")}</select></label><label>Subject<input data-inv="subject" value="${esc(d.subject)}" placeholder="${esc(subj)}"></label></div>
+          <label>Message<textarea data-inv="note" rows="5">${esc(d.note)}</textarea></label>
+          <label class="sc-check"><input type="checkbox" data-inv="ccMe"${d.ccMe ? " checked" : ""}> Send me a copy</label>
+          <div class="inv-acts"><button type="button" class="btn primary" data-inv-send${INV.busy ? " disabled" : ""}>${INV.busy ? "Sending…" : "Send email"}</button><span class="note">Sent from Pulse as ${esc(me)}; replies go to your inbox.</span></div>
+          ${INV.err ? `<div class="inv-err" role="alert">${esc(INV.err)}</div>` : ""}${INV.sent ? `<div class="inv-ok" role="status">${esc(INV.sent)}</div>` : ""}
+        </div>
+        <div class="inv-prev" aria-label="Preview"><div class="inv-prev-h">Preview</div><div class="inv-mail" id="invPrev">${invPreview()}</div></div>
+      </div>
+      ${recent.length ? `<div class="inv-recent"><div class="plist-h">Recently sent</div>${recent.map(r => `<div class="inv-r"><span>${esc(schedWhen(r.sent))}</span><b>${esc(r.name || r.to)}</b>${r.name ? `<span class="mono">${esc(r.to)}</span>` : ""}<span>${esc(r.type)}</span><span>by ${esc(r.by)}</span></div>`).join("")}</div>` : ""}
+    </section>`;
+  }
+  function invPreview() {
+    const d = INV.d, types = SCHED.data.types.filter(t => t.active), ty = types.find(t => t.slug === d.type);
+    const me = /^(vgillespie|victoria)$/.test(invMe().split("@")[0]) ? "Victoria Gillespie" : "Phil Ramsey";
+    const subj = d.subject || `${ty ? ty.name : "A conversation"} with ${SCHED.data.settings.orgName || "Victoria Gillespie Consulting Group"}`;
+    return `
+          <div class="inv-subj">${esc(subj)}</div>
+          <p><b>${d.name.trim() ? "Hi " + esc(d.name.trim().split(/\s+/)[0]) + "," : "Hello,"}</b></p>
+          ${String(d.note || "").trim().split(/\n\s*\n/).filter(p => p.trim()).map(p => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`).join("")}
+          ${ty ? `<p class="inv-what">${esc(ty.name)} · ${ty.minutes} minutes · Zoom</p>` : ""}
+          <p><span class="inv-btn">Pick a time</span></p>
+          <p class="inv-small">Times show in your own time zone. You'll get a confirmation with the Zoom link as soon as you book.</p>
+          <p class="inv-sig">${esc(me)}<br><span>${esc(SCHED.data.settings.orgName || "")}</span></p>`;
+  }
+  document.addEventListener("input", e => { const f = e.target.dataset && e.target.dataset.inv; if (!f || !INV.d) return; INV.d[f] = e.target.type === "checkbox" ? e.target.checked : e.target.value; const pv = document.getElementById("invPrev"); if (pv) pv.innerHTML = invPreview(); for (const k of [".inv-err", ".inv-ok"]) { const n = document.querySelector(k); if (n) n.remove(); } INV.err = ""; INV.sent = ""; });
+  document.addEventListener("change", e => { const f = e.target.dataset && e.target.dataset.inv; if (f === "type" && INV.d) { INV.d.type = e.target.value; const pv = document.getElementById("invPrev"); if (pv) pv.innerHTML = invPreview(); const sj = document.querySelector('[data-inv="subject"]'); if (sj) { const ty = SCHED.data.types.find(t => t.slug === INV.d.type); sj.placeholder = `${ty ? ty.name : "A conversation"} with ${SCHED.data.settings.orgName || "Victoria Gillespie Consulting Group"}`; } } });
+  document.addEventListener("click", async e => {
+    if (e.target.closest("[data-inv-open]")) { INV.open = true; INV.err = ""; INV.sent = ""; CAL.mode = "bookings"; renderMain(); setTimeout(() => { const n = document.querySelector('[data-inv="email"]'); if (n) n.focus(); }, 30); return; }
+    if (e.target.closest("[data-inv-close]")) { INV.open = false; renderMain(); return; }
+    if (e.target.closest("[data-inv-send]") && INV.d && !INV.busy) {
+      const d = INV.d;
+      if (!/^[^\s@<>,;]+@[^\s@<>,;]+\.[a-z]{2,}$/i.test(String(d.email).trim())) { INV.err = "Enter a valid email address."; renderMain(); return; }
+      INV.busy = true; INV.err = ""; renderMain();
+      try { const r = await gs("bkAdminInvite", { email: d.email.trim(), name: d.name.trim(), type: d.type, subject: d.subject.trim(), note: d.note, ccMe: !!d.ccMe, from: invMe() }); SCHED.data.invites = r.invites || SCHED.data.invites; INV.sent = `Sent to ${r.to}.`; INV.d = null; }
+      catch (x) { INV.err = /unknown|not allowed|no such/i.test(x.message) ? "The server doesn't have the email feature yet." : x.message; }
+      INV.busy = false; renderMain();
+    }
+  });
   function renderSched() {
     const main = $("#main"); schedLoad(false);
     const setup = CAL.mode === "setup"; if (setup && SCHED.tab === "bookings") SCHED.tab = "types"; if (!setup) SCHED.tab = "bookings";
     const head = `<div class="top sc-page"><header class="head"><div style="min-width:0"><div class="cal-title"><h1>Calendar</h1></div>${calModes()}
         <p class="lede">${setup ? "Meeting types and working hours for your VGCG booking pages. Open times are your hours minus anything already on your calendar." : "Meetings people booked through your VGCG booking pages. Each one is also on your calendar with its Zoom link."}</p></div>
-        <div class="cal-acts"><button type="button" class="btn" data-sc="refresh">Refresh</button>${SCHED.data ? `<button type="button" class="btn primary" data-sc-copy="${esc(schedBase())}">Copy booking link</button>` : ""}</div></header>
+        <div class="cal-acts"><button type="button" class="btn" data-sc="refresh">Refresh</button>${SCHED.data && state.canEdit ? `<button type="button" class="btn" data-inv-open>Email a booking link</button>` : ""}${SCHED.data ? `<button type="button" class="btn primary" data-sc-copy="${esc(schedBase())}">Copy booking link</button>` : ""}</div></header>
         ${SCHED.flash ? `<div class="banner cal-flash" role="status">${esc(SCHED.flash)}</div>` : ""}`;
     if (!SCHED.data) { main.innerHTML = head + `<div class="empty">${esc(SCHED.err || "Loading scheduling…")}</div></div>`; return; }
     const d = SCHED.data, now = Date.now();
@@ -3025,7 +3104,7 @@ button.cal-du.late{cursor:pointer}
       const list = SCHED.past ? d.bookings.filter(b => !(b.status === "confirmed" && Date.parse(b.end) >= now)).sort((a, b) => b.start.localeCompare(a.start)) : up;
       const tname = s => (d.types.find(t => t.slug === s) || { name: s }).name;
       const clientSel = b => `<select class="sc-client" data-sc-client="${esc(b.id)}" aria-label="Client for ${esc(b.name)}"><option value="">No client</option>${state.clients.slice().sort((x, y) => (x.short || x.name).localeCompare(y.short || y.name)).map(c => `<option value="${esc(c.id)}"${c.id === b.client ? " selected" : ""}>${esc(c.short || c.name)}</option>`).join("")}</select>`;
-      body = `<section class="section"><div class="section-head"><h2>${SCHED.past ? "Past and cancelled" : "Upcoming"}</h2><button type="button" class="linkbtn" data-sc-past>${SCHED.past ? "Show upcoming" : "Show past and cancelled"}</button></div>
+      body = invPanel() + `<section class="section"><div class="section-head"><h2>${SCHED.past ? "Past and cancelled" : "Upcoming"}</h2><button type="button" class="linkbtn" data-sc-past>${SCHED.past ? "Show upcoming" : "Show past and cancelled"}</button></div>
         ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>Meeting</th><th>Who</th><th>Client</th><th></th></tr></thead><tbody>${list.map(b => `<tr id="bk-${esc(b.id)}"${SCHED.hi === b.id ? ' class="sc-hi"' : ""}><td>${esc(schedWhen(b.start))}${b.visitorTz && b.visitorTz !== d.settings.tz ? `<div class="sub">their zone: ${esc(b.visitorTz.replace(/_/g, " "))}</div>` : ""}</td><td>${esc(tname(b.type))}${b.status !== "confirmed" ? ` <span class="sc-st">${esc(b.status)}</span>` : ""}</td><td><b>${esc(b.name)}</b>${b.org ? ` · ${esc(b.org)}` : ""}<div class="sub"><a href="mailto:${esc(b.email)}">${esc(b.email)}</a></div>${b.notes ? `<div class="sub sc-notes">${esc(b.notes)}</div>` : ""}</td><td>${clientSel(b)}</td><td>${b.status === "confirmed" && Date.parse(b.start) > now && state.canEdit ? `<button type="button" class="linkbtn" data-sc-cancel="${esc(b.id)}">Cancel</button>` : ""}</td></tr>`).join("")}</tbody></table></div>`
           : `<div class="empty">${SCHED.past ? "No past bookings in the last four months." : "No upcoming bookings. Share your booking link to get some."}</div>`}</section>`;
     } else if (SCHED.tab === "types") {
@@ -3912,7 +3991,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "bbc47d0160";
+  var BUILD = "b4267502f1";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;

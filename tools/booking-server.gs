@@ -17,7 +17,7 @@
  *      need no sign-in, and leaves every other call to the existing code.
  *   3. Wherever the web app lists the functions it accepts (the same place
  *      getIntel was added), add: bkAdminGet, bkAdminSave, bkAdminCancel,
- *      bkAdminSetClient. They get the usual sign-in check.
+ *      bkAdminSetClient, bkAdminInvite. They get the usual sign-in check.
  *   4. Deploy > Manage deployments > edit the current deployment > New version.
  *      Keep the same deployment so the URL doesn't change.
  *   5. The first run asks for Gmail (send mail) permission if the project
@@ -329,7 +329,7 @@ function bkPubReschedule(token, newStart) {
 
 function bkAdminGet() {
   var cfg = bkConfig_(), cutoff = Date.now() - 120 * 86400000;
-  return { settings: cfg.settings, types: cfg.types, defaults: bkDefaults_(),
+  return { settings: cfg.settings, types: cfg.types, defaults: bkDefaults_(), invites: bkInvites_(),
     bookings: bkRows_().filter(function (r) { return Date.parse(r.startUtc) >= cutoff; }).map(function (r) {
       return { id: r.id, type: r.type, name: r.name, email: r.email, org: r.org, notes: r.notes, visitorTz: r.visitorTz,
         status: r.status, client: r.client, start: r.startUtc, end: r.endUtc,
@@ -421,4 +421,59 @@ function bkMail_(cfg, kind, b) {
         (b.vtz ? '\nTheir time zone: ' + b.vtz : '') + (b.notes ? '\n\n' + b.notes : '') + (b.reason ? '\n\nReason: ' + b.reason : '') +
         '\n\nBooking ' + b.id + ' · manage it on the Scheduling page in Pulse.' });
   } catch (x) {}
+}
+
+/* ---------- booking invitations: Pulse sends someone a link to pick a time ---------- */
+
+var BK_INV_SHEET = 'Booking Invites';
+var BK_INV_COLS = ['Sent', 'To', 'Name', 'Meeting type', 'Sent by', 'Note'];
+
+function bkInvSheet_() {
+  var ss = SpreadsheetApp.getActive(), sh = ss.getSheetByName(BK_INV_SHEET);
+  if (!sh) { sh = ss.insertSheet(BK_INV_SHEET); sh.appendRow(BK_INV_COLS); sh.setFrozenRows(1); }
+  return sh;
+}
+function bkInvites_() {
+  var sh = bkInvSheet_(); if (sh.getLastRow() < 2) return [];
+  var n = Math.min(40, sh.getLastRow() - 1);
+  return sh.getRange(sh.getLastRow() - n + 1, 1, n, BK_INV_COLS.length).getValues().reverse().map(function (r) {
+    return { sent: r[0] instanceof Date ? r[0].toISOString() : String(r[0]), to: String(r[1]), name: String(r[2]), type: String(r[3]), by: String(r[4]) };
+  });
+}
+function bkInviteHtml_(cfg, inv, link, type, sender) {
+  var s = cfg.settings, logo = s.publicUrl.replace(/\/book\/?$/, '') + '/vgcg-mark.png';
+  var first = String(inv.name || '').trim().split(/\s+/)[0];
+  var paras = String(inv.note || '').trim().split(/\n\s*\n/).filter(function (p) { return p.trim(); }).map(function (p) {
+    return '<p style="margin:0 0 14px;color:#2b2730;font-size:15px;line-height:1.55">' + bkEsc_(p).replace(/\n/g, '<br>') + '</p>';
+  }).join('');
+  var what = type ? '<p style="margin:0 0 6px;font-size:13px;color:#67626e;text-transform:uppercase;letter-spacing:.08em">' + bkEsc_(type.name) + ' · ' + type.minutes + ' minutes · Zoom</p>' : '';
+  return '<div style="background:#f3f7f8;padding:28px 12px;font-family:Helvetica,Arial,sans-serif">' +
+    '<div style="max-width:520px;margin:0 auto;background:#fff;border:1px solid #dbe5e8;border-radius:14px;padding:28px">' +
+    '<img src="' + bkEsc_(logo) + '" width="44" height="42" alt="VGCG" style="display:block;margin-bottom:18px">' +
+    '<h1 style="margin:0 0 16px;font-size:22px;color:#2b2730">' + (first ? 'Hi ' + bkEsc_(first) + ',' : 'Hello,') + '</h1>' +
+    paras + what +
+    '<p style="margin:16px 0 18px"><a href="' + bkEsc_(link) + '" style="display:inline-block;background:#0077a6;color:#fff;text-decoration:none;padding:11px 20px;border-radius:8px;font-weight:600">Pick a time</a></p>' +
+    '<p style="margin:0 0 4px;color:#67626e;font-size:13px">Times show in your own time zone. You\'ll get a confirmation with the Zoom link as soon as you book.</p>' +
+    '<p style="margin:22px 0 0;padding-top:16px;border-top:1px solid #dbe5e8;font-size:14px;color:#2b2730">' + bkEsc_(sender.name) + '<br><span style="font-size:12px;color:#67626e">' + bkEsc_(s.orgName) + '</span></p>' +
+    '</div></div>';
+}
+function bkAdminInvite(inv) {
+  inv = inv || {};
+  var cfg = bkConfig_(), s = cfg.settings;
+  var to = String(inv.email || '').trim().toLowerCase();
+  if (!/^[^\s@<>,;]+@[^\s@<>,;]+\.[a-z]{2,}$/i.test(to)) throw new Error('Enter a valid email address.');
+  var type = null;
+  if (inv.type) { type = cfg.types.filter(function (t) { return t.slug === inv.type && t.active; })[0]; if (!type) throw new Error('That meeting type is turned off or no longer exists.'); }
+  var by = String(inv.from || '').toLowerCase();
+  var sender = /^(vgillespie|victoria)$/.test(by.split('@')[0]) ? { name: 'Victoria Gillespie', email: 'vgillespie@victoriagillespieconsulting.com' } : { name: 'Phil Ramsey', email: 'pramsey@victoriagillespieconsulting.com' };
+  var base = String(s.publicUrl || '').replace(/\/+$/, '');
+  var link = type ? base + '/' + type.slug : base;
+  var subject = String(inv.subject || '').trim().slice(0, 150) || ((type ? type.name : 'A conversation') + ' with ' + s.orgName);
+  if (MailApp.getRemainingDailyQuota() < 2) throw new Error('The daily email limit is reached. Try again tomorrow.');
+  MailApp.sendEmail({ to: to, subject: subject, name: sender.name + ' | ' + s.orgName, replyTo: sender.email,
+    cc: inv.ccMe ? sender.email : '',
+    htmlBody: bkInviteHtml_(cfg, inv, link, type, sender),
+    body: (String(inv.note || '').trim() ? String(inv.note).trim() + '\n\n' : '') + 'Pick a time: ' + link + '\n\n' + sender.name + '\n' + s.orgName });
+  bkInvSheet_().appendRow([new Date(), to, String(inv.name || '').slice(0, 120), type ? type.name : 'Any meeting type', sender.name, String(inv.note || '').slice(0, 2000)]);
+  return { sent: true, to: to, invites: bkInvites_() };
 }

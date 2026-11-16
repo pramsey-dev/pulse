@@ -24,3 +24,10 @@
   from = "/book/*"
   to = "/book.html"
   status = 200
+
+# Server source files are not part of the site.
+[[redirects]]
+  from = "/tools/*"
+  to = "/404"
+  status = 404
+  force = true
