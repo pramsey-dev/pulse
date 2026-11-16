@@ -229,8 +229,13 @@ a.qb:hover{text-decoration-color:currentColor}
 .sc-type .sc-check,.sc-day .sc-check{display:flex;flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:14px}
 .sc-link{font-size:13px;color:var(--muted)}.sc-link .mono{font:12px var(--f-mono);overflow-wrap:anywhere}
 .sc-hours{display:grid;gap:8px}
-.sc-day{display:grid;grid-template-columns:150px 130px auto 130px;justify-content:start;gap:10px;align-items:center;font-size:14px}
-.sc-day .note{grid-column:2/5}
+.sc-day{display:grid;grid-template-columns:150px minmax(0,1fr);justify-content:start;gap:10px;align-items:start;font-size:14px}
+.sc-day>.sc-check{padding-top:7px}
+.sc-day>.note{padding-top:7px}
+.sc-blocks{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.sc-blk{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sc-blk input{width:130px}
+.sc-addblk{font-size:13px;text-align:left}
 .sc-tz{max-width:280px}
 .sc-rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:start}
 .sc-rules .note,.sc-page section>label .note{font-size:12px}
@@ -238,7 +243,7 @@ a.qb:hover{text-decoration-color:currentColor}
 .sc-save .err{color:#b3261e;font-size:13px}
 .sc-st{font-size:12px;color:#b3261e;text-transform:capitalize}
 .sc-notes{white-space:pre-wrap;max-width:46ch}
-@media (max-width:760px){.sc-day{grid-template-columns:1fr 110px auto 110px}}
+@media (max-width:760px){.sc-day{grid-template-columns:1fr}.sc-blk input{width:126px}}
 .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 @media (max-width:640px){.prow{grid-template-columns:1fr}.prow .pr{grid-column:1;grid-row:auto;text-align:left;display:flex;gap:8px;align-items:baseline}}
 .tbl td .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
@@ -3039,7 +3044,7 @@ button.cal-du.late{cursor:pointer}
       const s = schedDraft().settings, num = (k, l, h) => `<label>${l}<input data-sf="${k}" type="number" min="0" value="${esc(s[k])}">${h ? `<span class="note">${h}</span>` : ""}</label>`;
       body = `<section class="section"><div class="section-head"><h2>Working hours</h2><span class="note">Open times are these hours minus anything already on your calendar.</span></div>
         <label class="sc-tz">Your time zone<select data-sf="tz">${CAL_TZ.map(([v, l]) => `<option value="${v}"${v === s.tz ? " selected" : ""}>${l}</option>`).join("")}</select></label>
-        <div class="sc-hours">${SCHED_DOW.map(([k, l]) => { const w = (s.hours[k] || [])[0]; return `<div class="sc-day"><label class="sc-check"><input type="checkbox" data-sh-on="${k}"${w ? " checked" : ""}> ${l}</label>${w ? `<input type="time" step="900" data-sh="${k}" data-sh-i="0" value="${esc(w[0])}" aria-label="${l} start"><span>to</span><input type="time" step="900" data-sh="${k}" data-sh-i="1" value="${esc(w[1])}" aria-label="${l} end">` : `<span class="note">Unavailable</span>`}</div>`; }).join("")}</div></section>
+        <div class="sc-hours">${SCHED_DOW.map(([k, l]) => { const ws = s.hours[k] || []; return `<div class="sc-day"><label class="sc-check"><input type="checkbox" data-sh-on="${k}"${ws.length ? " checked" : ""}> ${l}</label>${ws.length ? `<div class="sc-blocks">${ws.map((w, b) => `<div class="sc-blk"><input type="time" step="900" data-sh="${k}" data-sh-b="${b}" data-sh-i="0" value="${esc(w[0])}" aria-label="${l} start"><span>to</span><input type="time" step="900" data-sh="${k}" data-sh-b="${b}" data-sh-i="1" value="${esc(w[1])}" aria-label="${l} end">${ws.length > 1 ? `<button type="button" class="linkbtn" data-sh-del="${k}" data-sh-b="${b}" aria-label="Remove this block">Remove</button>` : ""}</div>`).join("")}<button type="button" class="linkbtn sc-addblk" data-sh-add="${k}">+ Add another block of hours</button></div>` : `<span class="note">Unavailable</span>`}</div>`; }).join("")}</div></section>
         <section class="section"><div class="section-head"><h2>Booking rules</h2></div><div class="sc-rules">
           ${num("bufferMin", "Buffer (minutes)", "kept free before and after meetings")}${num("noticeHours", "Minimum notice (hours)")}${num("daysAhead", "Book up to (days ahead)")}${num("dailyMax", "Most bookings per day", "0 means no limit")}${num("increment", "Start times every (minutes)")}</div>
           <label>Days off<input data-sf="blackout" value="${esc((s.blackout || []).join(", "))}" placeholder="2026-12-24, 2026-12-25"><span class="note">Dates as YYYY-MM-DD, separated by commas</span></label></section>
@@ -3066,6 +3071,8 @@ button.cal-du.late{cursor:pointer}
     if (t.closest("[data-sc-addtype]")) { schedDraft().types.push({ slug: "", name: "New meeting", minutes: 30, zoom: "phil", active: false, description: "", question: "" }); renderMain(); return; }
     const dt = t.closest("[data-sc-deltype]"); if (dt) { const ty = schedDraft().types[+dt.dataset.scDeltype]; if (confirm(`Remove "${ty.name}"? Its link stops working once you save.`)) { schedDraft().types.splice(+dt.dataset.scDeltype, 1); renderMain(); } return; }
     if (t.closest("[data-sc-discard]")) { SCHED.draft = null; renderMain(); return; }
+    const sha = t.closest("[data-sh-add]"); if (sha) { const w = schedDraft().settings.hours[sha.dataset.shAdd]; const last = w[w.length - 1] || ["09:00", "12:00"]; const [h, m] = last[1].split(":").map(Number); const st = Math.min(22 * 60, h * 60 + m + 60), en = Math.min(23 * 60 + 45, st + 240); const f = x => String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0"); w.push([f(st), f(en)]); renderMain(); return; }
+    const shd = t.closest("[data-sh-del]"); if (shd) { schedDraft().settings.hours[shd.dataset.shDel].splice(+shd.dataset.shB, 1); renderMain(); return; }
     const so = t.closest("[data-sh-on]"); if (so) { const s = schedDraft().settings; s.hours[so.dataset.shOn] = so.checked ? [["09:00", "17:00"]] : []; renderMain(); return; }
     if (t.closest("[data-sc-save]")) {
       SCHED.saving = true; renderMain();
@@ -3090,7 +3097,7 @@ button.cal-du.late{cursor:pointer}
     const ty = t.closest("[data-tf]"); if (ty) { const c = t.closest(".sc-type"), o = dr.types[+c.dataset.i], k = t.dataset.tf; o[k] = k === "active" ? t.checked : k === "minutes" ? Number(t.value) : t.value; }
     else if (t.dataset.sf) { const s = dr.settings, k = t.dataset.sf; s[k] = k === "blackout" ? t.value.split(/[\s,]+/).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)) : t.type === "number" ? Number(t.value) : t.value; }
     else if (t.dataset.sz) { dr.settings.zoom = { ...(dr.settings.zoom || {}), [t.dataset.sz]: t.value.trim() }; }
-    else if (t.dataset.sh) { const w = dr.settings.hours[t.dataset.sh]; if (w && w[0]) w[0][+t.dataset.shI] = t.value; }
+    else if (t.dataset.sh) { const w = dr.settings.hours[t.dataset.sh], b = +(t.dataset.shB || 0); if (w && w[b]) w[b][+t.dataset.shI] = t.value; }
     else return;
     const sv = document.querySelector("[data-sc-save]"); if (sv && !SCHED.saving) { sv.disabled = false; const n = sv.nextElementSibling; if (n && n.classList.contains("note")) n.outerHTML = `<button type="button" class="linkbtn" data-sc-discard>Discard</button>`; }
   }
@@ -3905,7 +3912,7 @@ Rules:
 </script>
 <script>
 (function () {
-  var BUILD = "bc92e17e20";
+  var BUILD = "bbc47d0160";
   function check() {
     fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
       if (!v || !v.build || v.build === BUILD) return;
