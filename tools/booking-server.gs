@@ -53,7 +53,7 @@ function bkDefaults_() {
       publicUrl: 'https://pulsedotdash.netlify.app/book',
       orgName: 'Victoria Gillespie Consulting Group',
       notifyEmail: '',      // blank = the script owner
-      zoom: { phil: 'https://us06web.zoom.us/j/6581398657', victoria: 'https://us06web.zoom.us/j/9878011120' }
+      zoom: { phil: 'https://us06web.zoom.us/j/6581398657?pwd=L3ZveGsxaXJGUEZOcU9pYVU3L1ZnZz09', victoria: 'https://us06web.zoom.us/j/6581398657?pwd=L3ZveGsxaXJGUEZOcU9pYVU3L1ZnZz09' }
     },
     types: [
       { slug: 'discovery-call', name: 'Discovery Call', minutes: 30, zoom: 'phil', active: true,
