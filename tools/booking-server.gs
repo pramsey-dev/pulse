@@ -50,7 +50,7 @@ function bkDefaults_() {
       increment: 30,        // start times every N minutes
       blackout: [],         // ["2026-12-24", …] days off
       extraCalendars: [],   // other calendar IDs to treat as busy
-      publicUrl: 'https://pulsedotdash.netlify.app/book',
+      publicUrl: 'https://book.victoriagillespieconsulting.com',
       orgName: 'Victoria Gillespie Consulting Group',
       notifyEmail: '',      // blank = the script owner
       zoom: { phil: 'https://us06web.zoom.us/j/6581398657?pwd=L3ZveGsxaXJGUEZOcU9pYVU3L1ZnZz09', victoria: 'https://us06web.zoom.us/j/6581398657?pwd=L3ZveGsxaXJGUEZOcU9pYVU3L1ZnZz09' }
