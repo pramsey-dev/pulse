@@ -14,6 +14,14 @@
   [headers.values]
     Cache-Control = "no-cache"
 
+# book.victoriagillespieconsulting.com sends people straight to the VGCG Introduction booking page.
+# 302 (not 301) so browsers don't cache it and it can be pointed elsewhere later.
+[[redirects]]
+  from = "https://book.victoriagillespieconsulting.com/*"
+  to = "https://pulsedotdash.netlify.app/book/vgcg-introduction"
+  status = 302
+  force = true
+
 # Public booking pages: /book and /book/<meeting-type> serve book.html.
 [[redirects]]
   from = "/book"
