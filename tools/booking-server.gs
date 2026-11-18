@@ -130,14 +130,18 @@ function bkHm_(m) { return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (
 
 /* ---------- availability ---------- */
 
-// Busy intervals [startMs, endMs] from the calendar(s), all-day and declined events skipped.
+// Busy intervals [startMs, endMs] from the calendar(s). Declined events and all-day events marked Free are skipped; an all-day event marked Busy blocks its whole days.
 function bkBusy_(s, fromMs, toMs, skipEventId) {
   var cals = [CalendarApp.getDefaultCalendar()];
   (s.extraCalendars || []).forEach(function (id) { try { var c = CalendarApp.getCalendarById(id); if (c) cals.push(c); } catch (x) {} });
   var out = [];
   cals.forEach(function (cal) {
     cal.getEvents(new Date(fromMs), new Date(toMs)).forEach(function (ev) {
-      if (ev.isAllDayEvent()) return;
+      if (ev.isAllDayEvent()) {
+        var opaque = false;
+        try { opaque = String(ev.getTransparency()) === String(CalendarApp.EventTransparency.OPAQUE); } catch (x) {}
+        if (!opaque) return;
+      }
       if (skipEventId && ev.getId() === skipEventId) return;
       try { if (ev.getMyStatus() === CalendarApp.GuestStatus.NO) return; } catch (x) {}
       out.push([ev.getStartTime().getTime(), ev.getEndTime().getTime()]);
