@@ -128,7 +128,9 @@ form.f input:focus,form.f textarea:focus,.tzrow select:focus{outline:2px solid v
 
   /* ---------- routing ---------- */
   const params = new URLSearchParams(location.search);
-  const pathSlug = (location.pathname.match(/\/book\/([a-z0-9-]+)\/?$/) || [])[1];
+  const onBookHost = /^book\./.test(location.hostname);
+  const pathSlug = (location.pathname.match(/\/book\/([a-z0-9-]+)\/?$/) || [])[1]
+    || (onBookHost ? ((location.pathname.match(/^\/([a-z0-9-]+)\/?$/) || [])[1] || (location.pathname === "/" && !params.has("t") && !params.has("all") && !params.has("b") ? "vgcg-introduction" : undefined)) : undefined);
   async function start() {
     try {
       const t = await call("bkPubTypes");
@@ -300,7 +302,7 @@ form.f input:focus,form.f textarea:focus,.tzrow select:focus{outline:2px solid v
   /* ---------- events ---------- */
   app.addEventListener("click", async e => {
     const ty = e.target.closest("[data-type]"); if (ty) { pickType(S.types.find(x => x.slug === ty.dataset.type)); history.replaceState(null, "", `?t=${ty.dataset.type}`); return; }
-    if (e.target.closest("[data-alltypes]")) { history.replaceState(null, "", location.pathname.replace(/\/book\/[a-z0-9-]+\/?$/, "/book")); viewTypes(); return; }
+    if (e.target.closest("[data-alltypes]")) { history.replaceState(null, "", onBookHost ? "/?all" : location.pathname.replace(/\/book\/[a-z0-9-]+\/?$/, "/book")); viewTypes(); return; }
     const mo = e.target.closest("[data-mon]"); if (mo && !mo.disabled) { S.month = shiftMonth(S.month, +mo.dataset.mon); S.day = null; loadMonth(false); renderPick(); return; }
     const dy = e.target.closest("[data-day]"); if (dy) { S.day = dy.dataset.day; renderPick(); const tl = $(".times"); if (tl && innerWidth <= 820) tl.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
     const tm = e.target.closest("[data-time]"); if (tm) {

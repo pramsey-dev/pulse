@@ -14,13 +14,25 @@
   [headers.values]
     Cache-Control = "no-cache"
 
-# book.victoriagillespieconsulting.com sends people straight to the VGCG Introduction booking page.
-# 302 (not 301) so browsers don't cache it and it can be pointed elsewhere later.
+# Server source files are not part of the site.
 [[redirects]]
-  from = "https://book.victoriagillespieconsulting.com/*"
-  to = "https://pulsedotdash.netlify.app/book/vgcg-introduction"
-  status = 302
+  from = "/tools/*"
+  to = "/404"
+  status = 404
   force = true
+
+# book.victoriagillespieconsulting.com shows the booking page under its own address (no visible redirect).
+# "/" opens VGCG Introduction; "/<meeting-type>" opens that type. Real files (logo, icons) still load as files.
+[[redirects]]
+  from = "https://book.victoriagillespieconsulting.com/"
+  to = "/book.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://book.victoriagillespieconsulting.com/:slug"
+  to = "/book.html"
+  status = 200
 
 # Public booking pages: /book and /book/<meeting-type> serve book.html.
 [[redirects]]
@@ -32,10 +44,3 @@
   from = "/book/*"
   to = "/book.html"
   status = 200
-
-# Server source files are not part of the site.
-[[redirects]]
-  from = "/tools/*"
-  to = "/404"
-  status = 404
-  force = true
